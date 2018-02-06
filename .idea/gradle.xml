@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/retromedia" />
+            <option value="$PROJECT_DIR$/retromedia-native" />
             <option value="$PROJECT_DIR$/sample" />
           </set>
         </option>

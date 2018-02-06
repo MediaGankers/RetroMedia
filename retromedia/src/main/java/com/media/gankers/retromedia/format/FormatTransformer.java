@@ -2,6 +2,8 @@ package com.media.gankers.retromedia.format;
 
 import android.support.annotation.NonNull;
 
+import com.media.gankers.retromedia.define.CropOperation;
+
 import java.io.File;
 
 /**
@@ -15,21 +17,18 @@ public class FormatTransformer {
     private String targetPath;
     private TransformCallback callback;
     private long startTime = 0, endTime = 0;
-    private float xStart = 0F, yStart = 0F, xOffset = 1F, yOffset = 1F;
+    private CropOperation crop;
 
     FormatTransformer(Intention intention, long startTime, long endTime, String filePath,
                       String targetPath, TransformCallback callback,
-                      float startX, float startY, float offsetX, float offsetY) {
+                      CropOperation operation) {
         this.intention = intention;
         this.startTime = startTime;
         this.endTime = endTime;
         this.filePath = filePath;
         this.targetPath = targetPath;
         this.callback = callback;
-        this.xStart = startX;
-        this.yStart = startY;
-        this.xOffset = offsetX;
-        this.yOffset = offsetY;
+        this.crop = operation;
     }
 
     public void startTransform() {
@@ -47,7 +46,7 @@ public class FormatTransformer {
         String filePath;
         String targetPath;
         TransformCallback callback;
-        float xStart = 0F, yStart = 0F, xOffset = 1F, yOffset = 1F;
+        CropOperation crop = new CropOperation();
 
         public Builder() {
         }
@@ -79,10 +78,7 @@ public class FormatTransformer {
         }
 
         public Builder crop(float startX, float startY, float offsetX, float offsetY) {
-            this.xStart = startX;
-            this.yStart = startY;
-            this.xOffset = offsetX;
-            this.yOffset = offsetY;
+            this.crop = new CropOperation(startX, startY, offsetX, offsetY);
             return this;
         }
 
@@ -102,7 +98,7 @@ public class FormatTransformer {
             }
             return new FormatTransformer(this.intention, this.startTime, this.endTime,
                     this.filePath, this.targetPath, this.callback,
-                    this.xStart, this.yStart, this.xOffset, this.yOffset);
+                    this.crop);
         }
     }
 }

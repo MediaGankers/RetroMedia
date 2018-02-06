@@ -1,16 +1,23 @@
 package com.media.gankers.retromedia.producer;
 
+import com.media.gankers.retromedia.define.FrameFormat;
+
+import java.nio.ByteBuffer;
+
 /**
  * Created by gordon on 2/3/18.
  */
 
 public class VideoFrame {
-    int format;
+
+    FrameFormat format;
     int width;
     int height;
     int stride;
+
     //可能是buffer数据
-    byte[] data;
+    ByteBuffer[] nativeData;
+
     //可能是纹理
-    int textureId;
+    ITexture texture;
 }

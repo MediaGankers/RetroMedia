@@ -1,1 +1,1 @@
-include ':sample', ':retromedia'
+include ':sample', ':retromedia', ':retromedia-native'

@@ -3,8 +3,8 @@ package com.media.gankers.retromedia.render.surface;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
-import com.media.gankers.retromedia.render.RenderView;
 import com.media.gankers.retromedia.render.ViewController;
+import com.media.gankers.retromedia.render.RenderView;
 
 /**
  * Created by gordon on 2/3/18.

@@ -3,10 +3,14 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/RetroMedia.iml" filepath="$PROJECT_DIR$/RetroMedia.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RetroMedia.iml" filepath="$PROJECT_DIR$/RetroMedia.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample/app.iml" filepath="$PROJECT_DIR$/sample/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/retromedia/retromedia.iml" filepath="$PROJECT_DIR$/retromedia/retromedia.iml" />
+      <module fileurl="file://$PROJECT_DIR$/retromedia/retromedia.iml" filepath="$PROJECT_DIR$/retromedia/retromedia.iml" />
+      <module fileurl="file://$PROJECT_DIR$/retromedia-native/retromedia-native.iml" filepath="$PROJECT_DIR$/retromedia-native/retromedia-native.iml" />
       <module fileurl="file://$PROJECT_DIR$/retromedia-native/retromedia-native.iml" filepath="$PROJECT_DIR$/retromedia-native/retromedia-native.iml" />
       <module fileurl="file://$PROJECT_DIR$/retromedia/retromedia2.iml" filepath="$PROJECT_DIR$/retromedia/retromedia2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
     </modules>
   </component>

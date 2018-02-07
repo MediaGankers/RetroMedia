@@ -7,10 +7,17 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+
         externalNativeBuild {
             cmake {
-                cppFlags ""
+                arguments "-DANDROID_ARM_NEON=TRUE", "-DANDROID_TOOLCHAIN=clang",
+                        "-DANDROID_PLATFORM=android-14", "-DUSE_MATTING=true",
+                        "-DUSE_HAIRDETECTOR=true", "-DUSE_ST_FACE_DETECTION=true",
+                        "-DUSE_ST_NEW=true",
+                        "-DANDROID_STL=c++_shared"
+                cppFlags "-frtti -fexceptions -std=c++11"
             }
+
         }
     }
     buildTypes {

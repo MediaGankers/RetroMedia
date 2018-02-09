@@ -7,8 +7,16 @@ import com.media.gankers.retromedia.producer.VideoFrame;
  */
 
 public class WaveInterceptor implements EffectInterceptor {
-    @Override
-    public void customEffect(VideoFrame videoFrame) {
 
+    private Effects mEffect;
+
+    @Override
+    public void processFrame(VideoFrame frame) {
+
+    }
+
+    @Override
+    public void setEffect(Effects effect) {
+        mEffect = effect;
     }
 }

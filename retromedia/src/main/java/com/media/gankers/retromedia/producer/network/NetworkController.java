@@ -1,10 +1,12 @@
-package com.media.gankers.retromedia.producer;
+package com.media.gankers.retromedia.producer.network;
 
 /**
  * Created by gordon on 2/3/18.
  */
 
-public interface MediaController {
+public interface NetworkController {
+
+    void switchURI(String newURI);
 
     void seek(long time);
 

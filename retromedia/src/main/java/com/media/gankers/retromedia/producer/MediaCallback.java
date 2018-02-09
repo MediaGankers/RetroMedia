@@ -5,5 +5,5 @@ package com.media.gankers.retromedia.producer;
  */
 
 public interface MediaCallback {
-    void onMediaFrame(VideoFrame frame);
+    void onFrameProduced(VideoFrame frame);
 }

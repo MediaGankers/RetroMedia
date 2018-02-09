@@ -16,8 +16,8 @@ public class VideoFrame {
     int stride;
 
     //可能是buffer数据
-    ByteBuffer[] nativeData;
+    ByteBuffer nativeData;
 
     //可能是纹理
-    ITexture texture;
+    ITexture textureData;
 }

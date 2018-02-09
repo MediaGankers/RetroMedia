@@ -5,7 +5,7 @@ package com.media.gankers.retromedia.producer;
  * 考虑文件格式，作为什么方式被打开，可选项包括
  */
 
-public interface MediaProvider {
+public interface MediaProducer {
 
     void openStream(MediaCallback callback);
 }

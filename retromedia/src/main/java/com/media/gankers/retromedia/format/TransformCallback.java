@@ -5,7 +5,10 @@ package com.media.gankers.retromedia.format;
  */
 
 public interface TransformCallback {
+
     void onProgress(int progress);
+
+    void onException(Exception exception);
 
     void onFinished(String filePath);
 }

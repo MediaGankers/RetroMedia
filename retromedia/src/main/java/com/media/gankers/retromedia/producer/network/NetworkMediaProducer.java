@@ -1,16 +1,20 @@
 package com.media.gankers.retromedia.producer.network;
 
 import com.media.gankers.retromedia.producer.MediaCallback;
-import com.media.gankers.retromedia.producer.MediaProvider;
-import com.media.gankers.retromedia.producer.MediaController;
+import com.media.gankers.retromedia.producer.MediaProducer;
 
 /**
  * Created by gordon on 2/3/18.
  */
 
-public class NetworkMediaProvider implements MediaProvider, MediaController {
+public class NetworkMediaProducer implements MediaProducer, NetworkController {
     @Override
     public void openStream(MediaCallback callback) {
+
+    }
+
+    @Override
+    public void switchURI(String newURI) {
 
     }
 

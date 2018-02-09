@@ -32,10 +32,11 @@ public class FormatTransformer {
     }
 
     public void startTransform() {
-        // TODO: 2/3/18  开始转化
+        // TODO: 2/3/18  start transforming
     }
 
     public void release() {
+        // TODO: 2/9/18  release native resources
         this.callback = null;
     }
 

@@ -1,17 +1,21 @@
 package com.media.gankers.retromedia.producer.file;
 
 import com.media.gankers.retromedia.producer.MediaCallback;
-import com.media.gankers.retromedia.producer.MediaController;
-import com.media.gankers.retromedia.producer.MediaProvider;
+import com.media.gankers.retromedia.producer.MediaProducer;
 
 /**
  * Created by gordon on 2/3/18.
  */
 
-public class FileMediaProvider implements MediaProvider, MediaController {
+public class FileMediaProducer implements MediaProducer, FileController {
 
     @Override
     public void openStream(MediaCallback callback) {
+
+    }
+
+    @Override
+    public void switchFile(String filePath) {
 
     }
 

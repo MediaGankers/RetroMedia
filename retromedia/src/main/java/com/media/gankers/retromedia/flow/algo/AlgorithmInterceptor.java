@@ -10,5 +10,5 @@ import java.nio.ByteBuffer;
 
 public interface AlgorithmInterceptor extends FlowInterceptor {
 
-    void customDraw(ByteBuffer nativeBuffer, int width, int height);
+    void applyAlgorithm(ByteBuffer nativeBuffer, int width, int height);
 }

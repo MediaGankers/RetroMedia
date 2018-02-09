@@ -1,5 +1,7 @@
 package com.media.gankers.retromedia.flow.effects;
 
+import android.media.effect.Effect;
+
 import com.media.gankers.retromedia.producer.VideoFrame;
 
 /**
@@ -7,8 +9,16 @@ import com.media.gankers.retromedia.producer.VideoFrame;
  */
 
 public class GussianInteceptor implements EffectInterceptor {
-    @Override
-    public void customEffect(VideoFrame videoFrame) {
 
+    private Effects mEffect;
+
+    @Override
+    public void processFrame(VideoFrame frame) {
+
+    }
+
+    @Override
+    public void setEffect(Effects effect) {
+        mEffect = effect;
     }
 }

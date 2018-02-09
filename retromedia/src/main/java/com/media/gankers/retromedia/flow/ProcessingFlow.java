@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import com.media.gankers.retromedia.flow.algo.AlgorithmInterceptor;
 import com.media.gankers.retromedia.flow.canvas.CanvasInterceptor;
 import com.media.gankers.retromedia.flow.effects.EffectInterceptor;
+import com.media.gankers.retromedia.flow.train.TrainInterceptor;
+import com.media.gankers.retromedia.producer.VideoFrame;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,8 +33,21 @@ public class ProcessingFlow {
         return this;
     }
 
+    public ProcessingFlow addTrain(@NonNull TrainInterceptor interceptor) {
+        mFlowInterceptors.add(interceptor);
+        return this;
+    }
+
     public ProcessingFlow removeInterceptor(@NonNull CanvasInterceptor interceptor) {
         mFlowInterceptors.remove(interceptor);
         return this;
+    }
+
+    public void process(VideoFrame frame) {
+
+    }
+
+    public static ProcessingFlow buildProcessingFlow() {
+        return new ProcessingFlow();
     }
 }

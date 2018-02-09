@@ -1,4 +1,4 @@
-package com.media.gankers.retromedia.consumer.texture;
+package com.media.gankers.retromedia.consumer.display.texture;
 
 import android.content.Context;
 import android.view.TextureView;

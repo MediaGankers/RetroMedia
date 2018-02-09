@@ -1,4 +1,4 @@
-package com.media.gankers.retromedia.consumer.surface;
+package com.media.gankers.retromedia.consumer.display.surface;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;

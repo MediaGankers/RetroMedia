@@ -1,7 +1,8 @@
 package com.media.gankers.retromedia.producer.network;
 
-import com.media.gankers.retromedia.producer.MediaCallback;
 import com.media.gankers.retromedia.producer.MediaProducer;
+import com.media.gankers.retromedia.producer.callback.MediaCallback;
+import com.media.gankers.retromedia.producer.callback.SnapCallback;
 
 /**
  * Created by gordon on 2/3/18.
@@ -10,6 +11,11 @@ import com.media.gankers.retromedia.producer.MediaProducer;
 public class NetworkMediaProducer implements MediaProducer, NetworkController {
     @Override
     public void openStream(MediaCallback callback) {
+
+    }
+
+    @Override
+    public void snapshot(SnapCallback callback) {
 
     }
 

@@ -1,7 +1,9 @@
 package com.media.gankers.retromedia.producer.file;
 
-import com.media.gankers.retromedia.producer.MediaCallback;
+import com.media.gankers.retromedia.define.PlaySpeed;
+import com.media.gankers.retromedia.producer.callback.MediaCallback;
 import com.media.gankers.retromedia.producer.MediaProducer;
+import com.media.gankers.retromedia.producer.callback.SnapCallback;
 
 /**
  * Created by gordon on 2/3/18.
@@ -15,7 +17,17 @@ public class FileMediaProducer implements MediaProducer, FileController {
     }
 
     @Override
+    public void snapshot(SnapCallback callback) {
+
+    }
+
+    @Override
     public void switchFile(String filePath) {
+
+    }
+
+    @Override
+    public void adjustSpeed(PlaySpeed speed) {
 
     }
 

@@ -12,23 +12,23 @@ import java.io.File;
 
 public class FormatTransformer {
 
-    private Intention intention = Intention.MP4_MP4;
-    private String filePath;
-    private String targetPath;
-    private TransformCallback callback;
-    private long startTime = 0, endTime = 0;
-    private CropOperation crop;
+    private Intention mIntention = Intention.MP4_MP4;
+    private String mFilePath;
+    private String mTargetPath;
+    private TransformCallback mCallback;
+    private long mStartTime = 0, mEndTime = 0;
+    private CropOperation mCrop;
 
     FormatTransformer(Intention intention, long startTime, long endTime, String filePath,
                       String targetPath, TransformCallback callback,
                       CropOperation operation) {
-        this.intention = intention;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.filePath = filePath;
-        this.targetPath = targetPath;
-        this.callback = callback;
-        this.crop = operation;
+        this.mIntention = intention;
+        this.mStartTime = startTime;
+        this.mEndTime = endTime;
+        this.mFilePath = filePath;
+        this.mTargetPath = targetPath;
+        this.mCallback = callback;
+        this.mCrop = operation;
     }
 
     public void startTransform() {
@@ -37,7 +37,7 @@ public class FormatTransformer {
 
     public void release() {
         // TODO: 2/9/18  release native resources
-        this.callback = null;
+        this.mCallback = null;
     }
 
     public static final class Builder {
@@ -85,10 +85,10 @@ public class FormatTransformer {
 
         public FormatTransformer build() throws Exception {
             if (this.filePath == null) {
-                throw new Exception("filePath should not be null");
+                throw new Exception("mFilePath should not be null");
             }
             if (this.targetPath == null) {
-                throw new Exception("targetPath should not be null");
+                throw new Exception("mTargetPath should not be null");
             }
             if (new File(this.filePath).exists()) {
                 throw new Exception("src file is not available");

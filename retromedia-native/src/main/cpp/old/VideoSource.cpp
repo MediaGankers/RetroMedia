@@ -3,7 +3,7 @@
 //
 #define LOG_TAG "VideoSource.cpp"
 
-#include "log_defs.h"
+#include "../log/utils_log.h"
 #include "VideoSource.h"
 #include "VideoSourceFile.h"
 

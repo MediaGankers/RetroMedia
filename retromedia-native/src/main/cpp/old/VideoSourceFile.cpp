@@ -4,7 +4,7 @@
 #define LOG_TAG "VideoSourceFile.cpp"
 
 #include "VideoSourceFile.h"
-#include "log_defs.h"
+#include "../log/utils_log.h"
 #include "VideoBufferWrapper.h"
 
 #define FRAME_RATE 30

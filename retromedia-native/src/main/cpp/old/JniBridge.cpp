@@ -3,7 +3,7 @@
 //
 #define LOG_TAG "JniBridge.cpp"
 
-#include "log_defs.h"
+#include "../log/utils_log.h"
 
 #include "JniBridge.h"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {

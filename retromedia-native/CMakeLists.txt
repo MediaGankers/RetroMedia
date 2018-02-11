@@ -18,11 +18,8 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              src/main/cpp/media-native.cpp
-             src/main/cpp/log.c
-             src/main/cpp/VideoBufferWrapper.cpp
-             src/main/cpp/VideoSource.cpp
-             src/main/cpp/VideoSourceFile.cpp
-             src/main/cpp/JniBridge.cpp)
+             src/main/cpp/engine/MediaEngine.cpp
+             src/main/cpp/log/log.c)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

@@ -10,5 +10,25 @@ public class MediaNative {
         System.loadLibrary("media-native");
     }
 
-    public native String helloFromJNI();
+    public native void init();
+
+    public native void startWork();
+
+    public native void stopWork();
+
+    void onData(byte[] data) {
+        if (mDeliver != null) {
+            mDeliver.deliver(String.valueOf(data));
+        }
+    }
+
+    public void callback(Deliver cb) {
+        mDeliver = cb;
+    }
+
+    private Deliver mDeliver;
+
+    public interface Deliver {
+        void deliver(String data);
+    }
 }

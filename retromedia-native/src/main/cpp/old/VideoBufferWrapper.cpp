@@ -2,7 +2,7 @@
 // Created by chao on 2018/2/6.
 //
 #define LOG_TAG "VideoBufferWrapper.cpp"
-#include "log_defs.h"
+#include "../log/utils_log.h"
 
 #include "VideoBufferWrapper.h"
 #include <math.h>

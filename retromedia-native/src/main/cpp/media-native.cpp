@@ -27,7 +27,7 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_media_gankers_medianative_MediaNative_init(JNIEnv *env, jobject obj) {
-    MediaEngine::inst().init(env,obj);
+    MediaEngine::inst().init(env, obj);
 }
 
 extern "C" JNIEXPORT void JNICALL

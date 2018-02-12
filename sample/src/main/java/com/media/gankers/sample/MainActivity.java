@@ -36,4 +36,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void deliver(String data) {
         Log.d("deliver", data);
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mMediaNative.stopWork();
+    }
 }

@@ -1,6 +1,9 @@
 //
 // Created by 罗明川 on 2/11/18.
 //
+
+#define LOG_TAG "MediaEngine.cpp"
+
 #include "MediaEngine.h"
 #include "../log/utils_log.h"
 #include "jni.h"
@@ -33,20 +36,24 @@ void MediaEngine::init(JNIEnv *env, jobject obj) {
 
 void MediaEngine::startWork() {
     mThread = std::auto_ptr<std::thread>(new std::thread(&MediaEngine::realJob, this));
-    mThread->join();
+    waitThread();
 }
 
 void MediaEngine::stopWork() {
-    mFlag = false;
+    mRun = FALSE;
 }
 
 void MediaEngine::realJob() {
-    usleep(1000 * 10);
-    while (mFlag) {
-        std::list<jobject>::iterator iterator = mCallbacks.begin();
-        while (iterator != mCallbacks.end()) {
-            jniEnv->CallVoidMethod((*iterator), mOnData, "hello");
-        }
+    mRun = TRUE;
+    while (mRun) {
+        ALOGD("get one message");
+        usleep(1000 * 1000);
+    }
+}
+
+void MediaEngine::waitThread() {
+    while (!mRun) {
+        usleep(1000 * 10);
     }
 }
 

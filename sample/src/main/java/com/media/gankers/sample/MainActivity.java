@@ -2,7 +2,6 @@ package com.media.gankers.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -34,8 +33,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void deliver(String data) {
-        Toast.makeText(this,data,Toast.LENGTH_SHORT).show();
+    public void deliver(final String data) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, data, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

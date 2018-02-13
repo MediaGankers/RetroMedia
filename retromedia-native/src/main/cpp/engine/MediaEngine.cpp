@@ -35,7 +35,9 @@ void MediaEngine::init(JNIEnv *env, jobject obj) {
 }
 
 void MediaEngine::startWork() {
-    mThread = std::auto_ptr<std::thread>(new std::thread(&MediaEngine::realJob, this));
+    if (mRun == FALSE && mThreadRunning == FALSE) {
+        mThread = std::shared_ptr<std::thread>(new std::thread(&MediaEngine::realJob, this));
+    }
     waitThread();
 }
 
@@ -44,11 +46,14 @@ void MediaEngine::stopWork() {
 }
 
 void MediaEngine::realJob() {
+    javaVM->AttachCurrentThread(&jniEnv, NULL);
     mRun = TRUE;
     while (mRun) {
         jniEnv->CallVoidMethod(mNativeHandle, mOnData, jniEnv->NewStringUTF(retValue.c_str()));
-        usleep(1000 * 1000);
+        usleep(1000 * 5000);
     }
+    mThreadRunning = FALSE;
+    javaVM->DetachCurrentThread();
 }
 
 void MediaEngine::waitThread() {

@@ -16,12 +16,14 @@ private:
     jobject mNativeHandle;
     jmethodID mOnData;
     volatile bool mRun = FALSE;
+    volatile bool mThreadRunning = FALSE;
     std::shared_ptr<std::thread> mThread;
     JavaVM *javaVM;
     JNIEnv *jniEnv;
     std::string retValue;
 
     void waitThread();
+
     MediaEngine();
 
     ~MediaEngine();
@@ -34,7 +36,7 @@ public:
 
     bool initInternal(JavaVM *jvm, JNIEnv *);
 
-    void init(JNIEnv*, jobject);
+    void init(JNIEnv *, jobject);
 
     void startWork();
 

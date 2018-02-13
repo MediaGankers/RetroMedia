@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.media.gankers.medianative.MediaNative;
 
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void deliver(String data) {
-        Log.d("deliver", data);
+        Toast.makeText(this,data,Toast.LENGTH_SHORT).show();
     }
 
     @Override

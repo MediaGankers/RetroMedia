@@ -21,7 +21,7 @@ bool MediaEngine::initInternal(JavaVM *jvm, JNIEnv *env) {
     jclass hostClazz = jniEnv->FindClass("com/media/gankers/medianative/MediaNative");
     CHECK_POINTER(hostClazz, FALSE, "can't execute FindClass!");
 
-    GET_METHOD_ID(jniEnv, hostClazz, mOnData, "onData", "([B)V");
+    GET_METHOD_ID(jniEnv, hostClazz, mOnData, "onData", "(Ljava/lang/String;)V");
     // get JVM object
     if (JNI_OK != jniEnv->GetJavaVM(&jvm)) {
         ALOGE("can't execute GetJavaVM!");
@@ -31,7 +31,7 @@ bool MediaEngine::initInternal(JavaVM *jvm, JNIEnv *env) {
 }
 
 void MediaEngine::init(JNIEnv *env, jobject obj) {
-    mCallbacks.push_back(env->NewGlobalRef(obj));
+    mNativeHandle = env->NewGlobalRef(obj);
 }
 
 void MediaEngine::startWork() {
@@ -46,7 +46,7 @@ void MediaEngine::stopWork() {
 void MediaEngine::realJob() {
     mRun = TRUE;
     while (mRun) {
-        ALOGD("get one message");
+        jniEnv->CallVoidMethod(mNativeHandle, mOnData, jniEnv->NewStringUTF(retValue.c_str()));
         usleep(1000 * 1000);
     }
 }
@@ -58,7 +58,7 @@ void MediaEngine::waitThread() {
 }
 
 MediaEngine::MediaEngine() {
-
+    retValue = "hello from jni callback.";
 }
 
 MediaEngine::~MediaEngine() {

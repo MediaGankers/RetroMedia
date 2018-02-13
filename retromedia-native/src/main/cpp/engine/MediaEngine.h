@@ -8,16 +8,18 @@
 #include <jni.h>
 #include <list>
 #include <thread>
+#include <string>
 #include "../macro/macro.h"
 
 class MediaEngine {
 private:
-    std::list<jobject> mCallbacks;
+    jobject mNativeHandle;
     jmethodID mOnData;
     volatile bool mRun = FALSE;
     std::shared_ptr<std::thread> mThread;
     JavaVM *javaVM;
     JNIEnv *jniEnv;
+    std::string retValue;
 
     void waitThread();
     MediaEngine();

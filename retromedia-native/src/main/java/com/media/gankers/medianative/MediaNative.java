@@ -16,9 +16,9 @@ public class MediaNative {
 
     public native void stopWork();
 
-    void onData(byte[] data) {
+    void onData(String data) {
         if (mDeliver != null) {
-            mDeliver.deliver(String.valueOf(data));
+            mDeliver.deliver(data);
         }
     }
 

@@ -5,7 +5,6 @@
 #ifndef RETROMEDIA_MACRO_H
 #define RETROMEDIA_MACRO_H
 
-#include "../macro/macro.h"
 #define TRUE true
 #define FALSE false
 

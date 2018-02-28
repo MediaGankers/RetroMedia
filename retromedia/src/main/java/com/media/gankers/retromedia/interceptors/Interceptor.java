@@ -1,4 +1,4 @@
-package com.media.gankers.retromedia.flow;
+package com.media.gankers.retromedia.interceptors;
 
 import com.media.gankers.retromedia.producer.VideoFrame;
 
@@ -6,7 +6,7 @@ import com.media.gankers.retromedia.producer.VideoFrame;
  * Created by gordon on 2/6/18.
  */
 
-public interface FlowInterceptor {
+public interface Interceptor {
 
     void processFrame(VideoFrame frame);
 }

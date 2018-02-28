@@ -1,4 +1,4 @@
-package com.media.gankers.retromedia.flow.effects;
+package com.media.gankers.retromedia.interceptors.effects;
 
 /**
  * Created by gordon on 2/9/18.

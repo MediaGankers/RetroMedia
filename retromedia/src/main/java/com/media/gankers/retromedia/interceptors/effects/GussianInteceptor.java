@@ -1,4 +1,4 @@
-package com.media.gankers.retromedia.flow.effects;
+package com.media.gankers.retromedia.interceptors.effects;
 
 import com.media.gankers.retromedia.producer.VideoFrame;
 
@@ -6,7 +6,7 @@ import com.media.gankers.retromedia.producer.VideoFrame;
  * Created by gordon on 2/6/18.
  */
 
-public class WaveInterceptor implements EffectInterceptor {
+public class GussianInteceptor implements EffectInterceptor {
 
     private Effects mEffect;
 

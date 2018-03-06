@@ -19,6 +19,17 @@ android {
             }
 
         }
+
+        sourceSets {
+            main {
+                assets.srcDirs 'assets'
+                jniLibs.srcDirs = ['src/main/prebuilt/libs/shared/']
+            }
+        }
+
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
     }
     buildTypes {
         release {

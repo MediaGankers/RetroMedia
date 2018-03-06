@@ -6,6 +6,7 @@
 #include "VideoSourceFile.h"
 #include "log_defs.h"
 #include "VideoBufferWrapper.h"
+#include "libyuv.h"
 
 #define FRAME_RATE 30
 

@@ -24,6 +24,8 @@ enum VideoPictureFormat {
 
 class VideoBuffer{
 public:
+    int64_t timestamp;
+public:
     virtual int alloc(uint32_t ) = 0;
     virtual int relloc(uint32_t ) = 0;
     virtual uint8_t *date() = 0;

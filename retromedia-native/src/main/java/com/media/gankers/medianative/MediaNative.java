@@ -8,6 +8,8 @@ public class MediaNative {
 
     static {
         System.loadLibrary("media-native");
+        System.loadLibrary("ffmpeg");
+        System.loadLibrary("yuv");
     }
 
     public native String helloFromJNI();

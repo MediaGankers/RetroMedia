@@ -2,6 +2,7 @@
 #include <string>
 #include "VideoSource.h"
 #include "VideoBufferWrapper.h"
+#include "Decoder.h"
 
 extern "C"
 JNIEXPORT jstring
@@ -16,6 +17,10 @@ Java_com_media_gankers_medianative_MediaNative_helloFromJNI(
     source->setSourceInfo(832, 480, kVideoPictureFormatI420);
     source->open();
     source->start();
+
+    ///////////
+    Decoder *decoder = new Decoder;
+    decoder->start("/sdcard/test.mp4");
     return env->NewStringUTF(hello.c_str());
 }
 

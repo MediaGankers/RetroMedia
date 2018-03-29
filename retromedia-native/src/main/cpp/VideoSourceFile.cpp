@@ -4,9 +4,9 @@
 #define LOG_TAG "VideoSourceFile.cpp"
 
 #include "VideoSourceFile.h"
-#include "log_defs.h"
-#include "VideoBufferWrapper.h"
+#include "common/log_defs.h"
 #include "libyuv.h"
+#include <unistd.h>
 
 #define FRAME_RATE 30
 
@@ -47,8 +47,9 @@ int VideoSourceFile::setSource(const std::string &str) {
 
 VideoSourceFile::~VideoSourceFile() {
     close();
-    if (mVideoBuffer) {
-        mVideoBuffer->release();
+    if (mVideoBufferPool) {
+        delete mVideoBufferPool;
+        mVideoBufferPool = nullptr;
     }
 }
 
@@ -57,7 +58,7 @@ mWidth(0),
 mHeight(0),
 mFormat(kVideoPictureFormatUnknown),
 mFile(nullptr),
-mVideoBuffer(nullptr){
+mVideoBufferPool(nullptr){
 
 }
 
@@ -84,20 +85,22 @@ bool VideoSourceFile::readDate() {
 
     int size = mWidth * mHeight * 3 / 2;
 
-    if (mVideoBuffer == nullptr) {
-        mVideoBuffer = VideoBufferWrapper::create();
-        mVideoBuffer->alloc(size);
+    if (mVideoBufferPool == nullptr) {
+        mVideoBufferPool = new VideoBufferPool(10, size, "VideoSourceFilePool");
     }
 
+    VideoBuffer *buffer = mVideoBufferPool->pollVideoBuffer();
+
     usleep(1000 / FRAME_RATE);
-    int rsize = fread(mVideoBuffer->date(), 1, size, mFile);
+    int rsize = fread(buffer->data(), 1, size, mFile);
 
     if (rsize <=0 ) {
         rewind(mFile);
-        rsize = fread(mVideoBuffer->date(), 1, size, mFile);
+        rsize = fread(buffer->data(), 1, size, mFile);
     }
 
-    bool deliverOk = VideoSource::deliver(mVideoBuffer);
+    bool deliverOk = VideoSource::deliver(buffer);
+    buffer->decRef();
 
     if (!deliverOk) {
         ALOGW("No deliver.....");

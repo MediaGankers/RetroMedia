@@ -6,7 +6,7 @@
 #define RETROMEDIA_VIDEOSOURCEFILE_H
 
 #include "VideoSource.h"
-
+#include "common/VideoBufferPool.h"
 class VideoSourceFile: public VideoSource {
 private:
     std::string mName;
@@ -14,7 +14,7 @@ private:
     int mHeight;
     VideoPictureFormat mFormat;
     FILE *mFile;
-    VideoBuffer *mVideoBuffer;
+    VideoBufferPool *mVideoBufferPool;
 protected:
     virtual bool readDate();
 public:

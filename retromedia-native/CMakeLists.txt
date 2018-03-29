@@ -18,7 +18,7 @@ set(libs "${CMAKE_SOURCE_DIR}/src/main/prebuilt/libs")
 set(dynamic_prebuilt  "${libs}/shared/${ANDROID_ABI}/")
 set(CC_IGNORE_OPTIONS "-Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-unused-private-field")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG -frtti -fexceptions -std=c++11 -g -fpermissive -pedantic -D__STDC_FORMAT_MACROS -Wall ${CC_IGNORE_OPTIONS} -Wreturn-type")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
@@ -59,17 +59,58 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              src/main/cpp/media-native.cpp
-             src/main/cpp/log.c
-             src/main/cpp/VideoBufferWrapper.cpp
+             src/main/cpp/common/log.c
              src/main/cpp/VideoSource.cpp
              src/main/cpp/VideoSourceFile.cpp
-             src/main/cpp/JniBridge.cpp
-             src/main/cpp/Decoder.cpp)
+             src/main/cpp/Decoder.cpp
+             src/main/cpp/source/MediaSource.cpp
+             src/main/cpp/source/CameraMediaSource.cpp
+             src/main/cpp/source/android/CameraMediaSourceOnAndroid.cpp
+             src/main/cpp/source/android/j4a/camera_wrapper.c
+             src/main/cpp/source/android/j4a/j4a_base.c
+             src/main/cpp/common/Reference.cpp
+             src/main/cpp/common/MessageQueue.cpp
+             src/main/cpp/common/DebugHelper.cpp
+             src/main/cpp/common/BufferPool.cpp
+             src/main/cpp/common/Buffer.cpp
+             src/main/cpp/common/JNIHelper.cpp
+             src/main/cpp/common/MetaData.cpp
+             src/main/cpp/common/TexBufferPool.cpp
+             src/main/cpp/common/VideoBufferPool.cpp
+             src/main/cpp/common/gl/Description.cpp
+             src/main/cpp/common/gl/GLES10RenderEngine.cpp
+             src/main/cpp/common/gl/GLES11RenderEngine.cpp
+             src/main/cpp/common/gl/GLES20RenderEngine.cpp
+             src/main/cpp/common/gl/GLExtensions.cpp
+             src/main/cpp/common/gl/GlUtils.cpp
+             src/main/cpp/common/gl/Mesh.cpp
+             src/main/cpp/common/gl/Program.cpp
+             src/main/cpp/common/gl/ProgramCache.cpp
+             src/main/cpp/common/gl/Rect.cpp
+             src/main/cpp/common/gl/Region.cpp
+             src/main/cpp/common/gl/RenderEngine.cpp
+             src/main/cpp/common/gl/Texture.cpp
+             src/main/cpp/common/gl/Transform.cpp)
 
 include_directories(
                     ${ffmpeg_inc}
                     ${yuv_inc}
+                    ${local_src}/main/cpp/
+                    ${local_src}/main/cpp/common
+                    ${local_src}/main/cpp/common/gl
+                    ${local_src}/main/cpp/source/android
                     )
+
+add_definitions(
+                -DGL_GLEXT_PROTOTYPES
+                -DEGL_EGLEXT_PROTOTYPES
+                -D__STDC_FORMAT_MACROS
+                )
+
+add_definitions(
+                -Wno-enum-compare
+                -Wno-four-char-constants
+               )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -93,4 +134,4 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} libffmpeg libyuv)
+                       ${log-lib} libffmpeg libyuv GLESv2 EGL GLESv1_CM)

@@ -6,7 +6,7 @@
 #define RETROMEDIA_VIDEOSOURCE_H
 
 #include <string>
-#include "VideoType.h"
+#include "BaseType.h"
 #include <list>
 #include <memory>
 #include <thread>
@@ -23,7 +23,7 @@ public:
     virtual int setSourceInfo(int w, int h, VideoPictureFormat type) { return ERRNUM();}
 
     virtual ~IVideoSource(){}
-    static IVideoSource *create(VideoSourceType type);
+    static IVideoSource *create(int type);
 };
 
 class VideoSource:public IVideoSource {
@@ -44,7 +44,7 @@ public:
     virtual bool readDate();
 
 protected:
-    virtual bool deliver(VideoBuffer *buffer);
+    virtual bool deliver(Buffer *buffer);
 };
 
 #endif //RETROMEDIA_VIDEOSOURCE_H

@@ -3,10 +3,10 @@
 //
 #define LOG_TAG "VideoSource.cpp"
 
-#include "log_defs.h"
+#include "common/log_defs.h"
 #include "VideoSource.h"
 #include "VideoSourceFile.h"
-
+#include "BaseType.h"
 #include <thread>
 
 int VideoSource::setCallback(IDeliver *deliver) {
@@ -57,11 +57,11 @@ VideoSource::VideoSource() {
     mThread = nullptr;
 }
 
-bool VideoSource::deliver(VideoBuffer *buffer) {
+bool VideoSource::deliver(Buffer *buffer) {
     bool ret = false;
     std::list<IDeliver *>::iterator item = mDelivers.begin();
     while (item != mDelivers.end()) {
-        (*item)->deliver(*buffer);
+        (*item)->deliver(buffer, StreamType::kStreamVideo);
         ret = true;
     }
     return ret;
@@ -72,14 +72,14 @@ int VideoSource::stop() {
     return 0;
 }
 
-IVideoSource *IVideoSource::create(VideoSourceType type) {
-    IVideoSource *source = nullptr;
-    switch (type) {
-        case kVideoSourceFile:
-            source = new VideoSourceFile;
-            break;
-        default:
-            break;
-    }
-    return source;
+IVideoSource *IVideoSource::create(int type) {
+//    IVideoSource *source = nullptr;
+//    switch (type) {
+//        case StreamType::kStreamVideo
+//            source = new VideoSourceFile;
+//            break;
+//        default:
+//            break;
+//    }
+//    return source;
 }

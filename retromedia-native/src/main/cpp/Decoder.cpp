@@ -7,8 +7,9 @@
 #include <chrono>
 #include <ratio>
 #include <list>
-#include "log_defs.h"
-#include "VideoBufferWrapper.h"
+#include "common/log_defs.h"
+#include "common/Buffer.h"
+#include <unistd.h>
 
 #define ALIGN_EDGE 16
 #define ENABLE_FPS_ESTIMATE
@@ -74,6 +75,7 @@ Decoder::Decoder() {
     mPause = true;
     mStart = false;
     mSpeed = 1.0f;
+    mBufferPool = NULL;
     ALOGD(" Decoder Ctor %p", this);
 }
 
@@ -252,17 +254,7 @@ int Decoder::stride() {
 
 VideoBuffer *Decoder::genVideoBuffer(VideoBuffer **vframe) {
     VideoBuffer *frame = NULL;
-    int size = 0;
-    if (mVideoCodecCtx) {
-        size = stride() * mVideoCodecCtx->height * 3 / 2;
-    }
-
-    if (size >0) {
-        if (*vframe == NULL) {
-            *vframe = VideoBufferWrapper::create();
-            (*vframe)->alloc(size);
-        }
-    }
+    *vframe = mBufferPool->pollVideoBuffer();
     return *vframe;
 }
 
@@ -316,7 +308,7 @@ void Decoder::decodeThread() {
             break;
         }
 
-        int64_t currTimeBase = frame->timestamp;
+        int64_t currTimeBase = frame->mTimestamp;
         swapBuffer();
 
         int64_t decodeTimeDiff = av_gettime() - decodeTime;
@@ -370,15 +362,15 @@ VideoBuffer *Decoder::decodeFrame(VideoBuffer * frame) {
         }
 
         AVPicture *pic = (AVPicture *)mVideoFrame;
-        ret = av_image_copy_to_buffer(frame->date(), stride() * height() * 3 / 2, (const uint8_t * const*)pic->data,
+        ret = av_image_copy_to_buffer(frame->data(), frame->size(), (const uint8_t * const*)pic->data,
                                       pic->linesize, PIX_FMT_YUV420P, mVideoCodecCtx->width, mVideoCodecCtx->height,
                                       ALIGN_EDGE);
 
         //frame->size = mVideoCodecCtx->width * mVideoCodecCtx->height * 3 / 2;
-        frame->timestamp = av_rescale_q(mVideoFrame->pkt_pts,
+        frame->mTimestamp = av_rescale_q(mVideoFrame->pkt_pts,
                                         mFormatCtx->streams[mVideoStreamIdx]->time_base,
                                         (AVRational) {1, AV_TIME_BASE});
-        //frame->duration = mVideoFrame->pkt_duration;
+        frame->mDuratioin = mVideoFrame->pkt_duration;
         break;
     }
 
@@ -399,9 +391,13 @@ void Decoder::resume() {
 }
 
 void Decoder::initVideoBuffer() {
+
+    if (mBufferPool == nullptr) {
+        mBufferPool = new VideoBufferPool(10, stride() * height() * 3 / 2, "VideoDecoderPool");
+    }
     // Decode First frame
     decodeFrame(genVideoBuffer(&mBackBuffer));
-    mStartTime = mBackBuffer->timestamp;
+    mStartTime = mBackBuffer->mTimestamp;
     swapBuffer();
 }
 
@@ -412,7 +408,7 @@ void Decoder::swapBuffer() {
 
 void Decoder::deleteVideoBuffer(VideoBuffer **pFrame) {
     if (*pFrame) {
-        (*pFrame)->release();
+        (*pFrame)->decRef();
     }
 }
 

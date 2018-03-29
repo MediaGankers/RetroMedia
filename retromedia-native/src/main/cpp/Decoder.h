@@ -12,7 +12,7 @@
 #include <thread>
 #include <condition_variable>
 #include <atomic>
-#include "VideoType.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +39,8 @@ extern "C" {
 }
 #endif
 
-#define AudioBuffer VideoBuffer
+#include "common/VideoBufferPool.h"
+typedef Buffer AudioBuffer;
 
 class Decoder {
 private:
@@ -61,6 +62,7 @@ private:
     bool             mStart;
     int64_t          mStartTime;
     long             mSeek;
+    VideoBufferPool  *mBufferPool;
 private:
     void initFFmpeg();
 

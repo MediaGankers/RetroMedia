@@ -9,6 +9,7 @@
 #include "GLES20RenderEngine.h"
 #include "GLExtensions.h"
 #include <sstream>
+#include <common/DebugHelper.h>
 
 EGLAPI const char* eglQueryStringImplementationANDROID(EGLDisplay dpy, EGLint name);
 
@@ -146,6 +147,7 @@ RenderEngine::RenderEngine() : mEGLContext(EGL_NO_CONTEXT) {
 }
 
 RenderEngine::~RenderEngine() {
+    SCOPEDDEBUG();
 }
 
 void RenderEngine::setEGLHandles(EGLConfig config, EGLContext ctxt) {

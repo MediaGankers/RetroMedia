@@ -21,7 +21,7 @@ enum StreamType {
     kStreamAudio
 };
 
-class IDeliver {
+class IDeliver: public Reference{
 public:
     virtual int deliver(Buffer *buffer, StreamType type) = 0;
 };

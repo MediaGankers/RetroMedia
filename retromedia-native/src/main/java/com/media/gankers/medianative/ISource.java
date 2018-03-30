@@ -100,9 +100,7 @@ public abstract class ISource{
         return -1;
     }
 
-    public void addDeliver(IDeliver deliver) {
-        mDelivers.add(deliver);
-    }
+    public native void addDeliver(IDeliver deliver);
 
     public native int stop();
 
@@ -133,15 +131,6 @@ public abstract class ISource{
         void onInfo(ISource source, Message msg);
         void onPreped(ISource source, Message msg);
         void onStatus(ISource source, Message msg);
-    }
-
-    private void deliverByNative(Buffer buffer) {
-        if (mDelivers != null && !mDelivers.isEmpty()) {
-            for (IDeliver d:mDelivers
-                 ) {
-                d.deliver(buffer);
-            }
-        }
     }
 
     @Override

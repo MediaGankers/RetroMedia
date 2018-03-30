@@ -7,6 +7,7 @@
 #include "GLES11RenderEngine.h"
 #include <gl/Mesh.h>
 #include <gl/Texture.h>
+#include <common/DebugHelper.h>
 
 // ---------------------------------------------------------------------------
 namespace openGl {
@@ -36,6 +37,7 @@ GLES11RenderEngine::GLES11RenderEngine() {
 }
 
 GLES11RenderEngine::~GLES11RenderEngine() {
+    SCOPEDDEBUG();
 }
 
 

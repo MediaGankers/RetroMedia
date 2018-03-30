@@ -3,6 +3,7 @@
 #include <log_defs.h>
 #include <JNIHelper.h>
 #include <DebugHelper.h>
+#include "JavaDeliver.h"
 #include "VideoSource.h"
 #include "Decoder.h"
 #include "common/TexBufferPool.h"
@@ -10,13 +11,23 @@
 #include "source/CameraMediaSource.h"
 #include "source/android/CameraMediaSourceOnAndroid.h"
 #include "j4a/camera_wrapper.h"
+#include "j4a/i_deliver.h"
+#include "j4a/buffer.h"
+
 extern "C"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     JNIHelper::setupJVM(vm);
 
     JNIHelper helper;
-    J4A_loadClass__J4AC_com_media_gankers_medianative_CameraWrapper(helper.env());
+    int ret = J4A_loadClass__J4AC_com_media_gankers_medianative_CameraWrapper(helper.env());
+    ret += J4A_loadClass__J4AC_com_media_gankers_medianative_IDeliver(helper.env());
+    ret += J4A_loadClass__J4AC_com_media_gankers_medianative_Buffer(helper.env());
+
+    if (ret) {
+         ALOGW("Load class failed. Camera will be no to used on Android.");
+    }
+
     return JNI_VERSION_1_6;
 }
 
@@ -164,6 +175,7 @@ Java_com_media_gankers_medianative_Buffer_addRef(JNIEnv *env, jobject instance) 
 
     if (nativeBuffer) {
         nativeBuffer->addRef();
+        ALOGI("Native Buffer cnt %d this %p",nativeBuffer->count(), nativeBuffer);
     }
 }extern "C"
 JNIEXPORT void JNICALL
@@ -504,4 +516,40 @@ Java_com_media_gankers_medianative_ISource_status(JNIEnv *env, jobject instance)
         return source->status();
     }
     return ERRNUM();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_media_gankers_medianative_ISource_addDeliver(JNIEnv *env, jobject instance,
+                                                      jobject deliver) {
+
+    SCOPEDDEBUG();
+    // TODO
+    jclass cls = env->GetObjectClass(instance);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+
+    MediaSource *source = (MediaSource *) (env->GetLongField(instance, nativeField));
+
+    if (source && deliver) {
+        IDeliver *d = new JavaDeliver(deliver);
+        d->addRef();
+        source->addDeliver(d);
+        d->decRef();
+    }else {
+            ALOGE("Register deliver failed.");
+    }
+}extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_media_gankers_medianative_TextureBuffer_get(JNIEnv *env, jclass type, jobject buffer) {
+
+    // TODO
+    jclass cls = env->GetObjectClass(buffer);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+    TexBuffer *nativeBuffer = TexBuffer::get((Buffer *)env->GetLongField(buffer, nativeField));
+
+    jobject obj = nullptr;
+    if (nativeBuffer) {
+        jmethodID mid = env->GetMethodID(type, "<init>", "(J)V");
+        int64_t tb = (int64_t)nativeBuffer;
+        obj = env->NewObject(type, mid, tb);
+    }
+    return obj;
 }

@@ -94,6 +94,7 @@ JNIHelper::~JNIHelper() {
 }
 
 JNIHelper::GlobalObject::GlobalObject(jobject obj) {
+    mObj = nullptr;
     setObj(obj);
 }
 

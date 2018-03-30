@@ -106,6 +106,8 @@ protected:
 
 protected:
     MetaData *mMetaData;
+
+    void clearDeliver();
 };
 
 

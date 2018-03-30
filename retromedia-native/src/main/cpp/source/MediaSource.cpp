@@ -44,7 +44,7 @@ int MediaSource::release() {
 }
 
 int MediaSource::reset() {
-    mDelivers.clear();
+    clearDeliver();
     mMetaData->clear();
     setStatus(kIdle);
     return 0;
@@ -52,6 +52,7 @@ int MediaSource::reset() {
 
 void MediaSource::addDeliver(IDeliver *d) {
     if (d) {
+        d->addRef();
         mDelivers.push_back(d);
     }
 }
@@ -84,7 +85,11 @@ MediaSource::Status MediaSource::setStatus(MediaSource::Status stat) {
 
 void MediaSource::removeDeliver(IDeliver *d) {
     if (d) {
-        mDelivers.remove(d);
+        std::list<IDeliver *>::iterator it = std::find(mDelivers.begin(), mDelivers.end(), d);
+        if (it != mDelivers.end()) {
+            mDelivers.remove(d);
+            d->decRef();
+        }
     }
 }
 
@@ -115,5 +120,16 @@ bool MediaSource::deliver(Buffer *buffer, StreamType type) {
 }
 
 MediaSource::~MediaSource() {
+    clearDeliver();
     mMetaData->decRef();
+}
+
+void MediaSource::clearDeliver() {
+    std::list<IDeliver *>::iterator it = mDelivers.begin();
+
+    while (it != mDelivers.end()) {
+        (*it)->decRef();
+        mDelivers.pop_front();
+        it = mDelivers.begin();
+    }
 }

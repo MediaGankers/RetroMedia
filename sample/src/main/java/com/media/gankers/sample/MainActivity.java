@@ -1,7 +1,6 @@
 package com.media.gankers.sample;
 
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -9,10 +8,10 @@ import android.widget.Toast;
 
 import com.media.gankers.medianative.Buffer;
 import com.media.gankers.medianative.CameraMediaSource;
-import com.media.gankers.medianative.FileSource;
 import com.media.gankers.medianative.IDeliver;
 import com.media.gankers.medianative.ISource;
 import com.media.gankers.medianative.MediaNative;
+import com.media.gankers.medianative.TextureBuffer;
 import com.media.gankers.medianative.VideoBuffer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -47,12 +46,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          bb.dump();
 
 
+
          ISource cameraSource = new CameraMediaSource();
          Log.d("stone","status " + cameraSource.status());
 
          cameraSource.setConfig(ISource.KEY_VIDEO_FPS, 30);
-         cameraSource.setConfig(ISource.KEY_VIDEO_WIDTH, 1280);
-         cameraSource.setConfig(ISource.KEY_VIDEO_HEIGHT, 720);
+         cameraSource.setConfig(ISource.KEY_VIDEO_WIDTH, 300);
+         cameraSource.setConfig(ISource.KEY_VIDEO_HEIGHT, 400);
          cameraSource.setConfig(CameraMediaSource.KEY_VIDEO_USING_FRONT, 1);
          cameraSource.setConfig(CameraMediaSource.KEY_VIDEO_MIRROR, 1);
 
@@ -63,6 +63,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("stone","start ret  " + cameraSource.start());
         //Log.d("stone","start ret  " + cameraSource.pause());
         //Log.d("stone","start ret  " + cameraSource.release());
+        cameraSource.addDeliver(new IDeliver() {
+            @Override
+            public void deliver(Buffer buffer, int type) {
 
+                TextureBuffer vb = TextureBuffer.get(buffer);
+                Log.d("stone", " tex id " + vb.textureId() + " w " + vb.width() + " h " + vb.height() + "texType " + vb.textureType());
+
+                // GC 回收太慢了，我们主要主动回收掉这个buffer，否则native层buffer达到最大数目就会丢帧
+                vb.release();
+                buffer.release();
+            }
+        });
     }
 }

@@ -3,6 +3,7 @@
 //
 
 #include "TexBufferPool.h"
+#include "DebugHelper.h"
 
 TexBufferPool::TexBufferPool(int maxNum, int w, int h, const std::string &name) : BufferPool(
         maxNum, 0, name) {
@@ -51,6 +52,7 @@ TexBuffer *TexBuffer::get(Buffer *buffer) {
 }
 
 TexBuffer::~TexBuffer() {
+    SCOPEDDEBUG();
     if (mTex) {
         GlUtils::deleteTexture(1, &mTex);
     }

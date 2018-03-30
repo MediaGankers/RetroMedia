@@ -66,7 +66,10 @@ add_library( # Sets the name of the library.
              src/main/cpp/source/MediaSource.cpp
              src/main/cpp/source/CameraMediaSource.cpp
              src/main/cpp/source/android/CameraMediaSourceOnAndroid.cpp
+             src/main/cpp/source/android/JavaDeliver.cpp
              src/main/cpp/source/android/j4a/camera_wrapper.c
+             src/main/cpp/source/android/j4a/i_deliver.c
+             src/main/cpp/source/android/j4a/buffer.c
              src/main/cpp/source/android/j4a/j4a_base.c
              src/main/cpp/common/Reference.cpp
              src/main/cpp/common/MessageQueue.cpp

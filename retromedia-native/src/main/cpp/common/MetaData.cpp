@@ -8,8 +8,11 @@
 #include <assert.h>
 
 #include "MetaData.h"
+#include "DebugHelper.h"
 
 MetaData::MetaData() {
+    SCOPEDDEBUG();
+
 }
 
 MetaData::MetaData(const MetaData &from)
@@ -17,6 +20,7 @@ MetaData::MetaData(const MetaData &from)
 }
 
 MetaData::~MetaData() {
+    SCOPEDDEBUG();
     clear();
 }
 

@@ -23,6 +23,7 @@ public class TextureBuffer extends Buffer {
 
     public native static TextureBuffer create(int w, int h, byte[] bytes);
 
+    public native static TextureBuffer get(Buffer buffer);
     @Override
     protected void finalize() throws Throwable {
         super.finalize();

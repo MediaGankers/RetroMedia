@@ -2,8 +2,11 @@
 // Created by chao on 2018/3/26.
 //
 
+#define LOG_TAG "MessageQueue"
+
 #include "MessageQueue.h"
 #include "DebugHelper.h"
+#include "log_defs.h"
 #include <thread>
 
 struct MsgBox {
@@ -44,6 +47,7 @@ MessageQueue::Msg MessageQueue::peek() {
 MessageQueue::MessageQueue(int size, bool haveThread) {
     mSize = size;
     mExit = false;
+    mFlush = true;
     mThread = nullptr;
 
     mQueue = new QueueList;
@@ -60,9 +64,10 @@ int MessageQueue::size() {
 }
 
 bool MessageQueue::post(MessageQueue::Msg &msg) {
+    SCOPEDDEBUG();
     bool postDone = false;
     std::lock_guard<std::mutex> lock_guard(mLock);
-    if (MQUEUE()->size() < mSize) {
+    if (MQUEUE()->size() < mSize && !mExit) {
         MsgBox box;
         box.msg = msg;
         MQUEUE()->push_back(box);
@@ -119,6 +124,18 @@ void MessageQueue::loop() {
         box.msg = poll();
         if (box.msg.hwd) {
             box.msg.hwd->process(&box.msg);
+        }
+    }
+
+    int remainMsg = size();
+    if (mExit && remainMsg > 0 && mFlush) {
+        ALOGI("Flush MessageQueue remain size %d", remainMsg);
+        while (size() > 0) {
+            MsgBox box;
+            box.msg = pollTime(0);
+            if (box.msg.hwd) {
+                box.msg.hwd->process(&box.msg);
+            }
         }
     }
 

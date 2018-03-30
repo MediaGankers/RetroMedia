@@ -13,6 +13,7 @@
 #include "Description.h"
 #include <gl/Mesh.h>
 #include <gl/Texture.h>
+#include <common/DebugHelper.h>
 
 // ---------------------------------------------------------------------------
 namespace openGl {
@@ -41,6 +42,7 @@ GLES20RenderEngine::GLES20RenderEngine() :
 }
 
 GLES20RenderEngine::~GLES20RenderEngine() {
+    SCOPEDDEBUG();
 }
 
 

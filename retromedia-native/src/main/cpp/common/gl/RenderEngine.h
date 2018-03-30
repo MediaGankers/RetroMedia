@@ -43,7 +43,7 @@ class RenderEngine {
 
 protected:
     RenderEngine();
-    virtual ~RenderEngine() = 0;
+    virtual ~RenderEngine();
 
 public:
     static RenderEngine* create(EGLContext ctx = nullptr);

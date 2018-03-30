@@ -64,12 +64,11 @@ public:
     std::mutex mSyncLock;
     std::condition_variable mSyncCond;
     openGl::Texture mCameraTex;
+    openGl::Mesh *mMesh;
 
     void createRenderEngine();
 
     void draw();
-
-    openGl::Mesh *mMesh;
 
     int stopInternal();
 };

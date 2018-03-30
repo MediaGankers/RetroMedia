@@ -48,6 +48,7 @@ private:
     std::condition_variable mCond;
     int mSize;
     bool mExit;
+    bool mFlush;
 };
 
 

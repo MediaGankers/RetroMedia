@@ -17,6 +17,7 @@ public class CameraMediaSource extends ISource {
 
     @Override
     protected int init() {
+        super.init();
        return initNative();
     }
 

@@ -7,7 +7,7 @@
 #include <DebugHelper.h>
 #include <gl/Texture.h>
 #include "CameraMediaSourceOnAndroid.h"
-
+#include "j4a/camera_wrapper.h"
 
 struct MessagePrivate {
     MessageQueue::Msg msg;
@@ -114,47 +114,40 @@ int CameraMediaSourceOnAndroid::prepare() {
 
     setStatus(kPreparing);
 
-    static jclass jcls = helper.env()->FindClass("com/media/gankers/medianative/CameraWrapper");
-    static jmethodID jStartPeview = jcls ? helper.env()->GetMethodID(jcls, "startPreview", "(I)Z")
-                                         : nullptr;
-    static jmethodID jopen = jcls ? helper.env()->GetMethodID(jcls, "open", "(I)Z") : nullptr;
-    static jmethodID jrelease = jcls ? helper.env()->GetMethodID(jcls, "release", "()V") : nullptr;
-    static jmethodID jconstruct = jcls ? helper.env()->GetMethodID(jcls, "<init>", "(J)V") : nullptr;
-    static jmethodID jgetFrontCamIdx = jcls ? helper.env()->GetStaticMethodID(jcls,
-                                                                              "getFrontCameraIdx",
-                                                                              "()I") : nullptr;
-    static jmethodID jgetBackCamIdx = jcls ? helper.env()->GetStaticMethodID(jcls,
-                                                                             "getBackCameraIdx",
-                                                                             "()I") : nullptr;
+    jobject camInst = J4AC_com_media_gankers_medianative_CameraWrapper__CameraWrapper__catchAll(helper.env(), (int64_t) this);
+    JNIHelper::LocalRefObject localRef(camInst);
 
-    JNIHelper::LocalRefObject localRef(nullptr);
-    if (jconstruct) {
-        localRef.setObj(helper.env()->NewObject(jcls, jconstruct, (int64_t) this));
-
-        if (localRef.mObj) {
+        if (camInst) {
             int isFront = -1;
             int idx = 0;
             mMetaData->findInt32(kKeyCamSourceFront, &isFront);
 
             if (isFront) {
-                idx = helper.env()->CallStaticIntMethod(jcls, jgetFrontCamIdx);
+                idx = J4AC_com_media_gankers_medianative_CameraWrapper__getFrontCameraIdx__catchAll(helper.env());
             } else {
-                idx = helper.env()->CallStaticIntMethod(jcls, jgetBackCamIdx);
+                idx = J4AC_com_media_gankers_medianative_CameraWrapper__getBackCameraIdx__catchAll(helper.env());
             }
 
-            if (helper.env()->CallBooleanMethod(localRef.mObj, jopen, idx)) {
+            bool opened = J4AC_com_media_gankers_medianative_CameraWrapper__open__catchAll(helper.env(), camInst, idx);
+            if (opened) {
                 int oesTex = getOESTexture();
-                ret = helper.env()->CallBooleanMethod(localRef.mObj, jStartPeview, oesTex) ? 0
-                                                                                           : ERRNUM();
+                bool startPreviewed = J4AC_com_media_gankers_medianative_CameraWrapper__startPreview__catchAll(helper.env(), camInst, oesTex);
+                ret = startPreviewed ? 0 : ERRNUM();
             }
         }
-    }
 
     if (!ret) {
-        mCamJava.setObj(localRef.mObj);
+        mCamJava.setObj(camInst);
         setStatus(kPreared);
     } else {
         setStatus(kError);
+        char buffer[1024] = {0};
+        const char *errStr = J4AC_com_media_gankers_medianative_CameraWrapper__getExceptionMessage__asCBuffer__catchAll(helper.env(), camInst, buffer, 1024);
+
+        if (errStr) {
+            ALOGE("Preparing camera failed [%s]", errStr);
+            mMetaData->dumpToLog();
+        }
     }
 
     return ret;
@@ -174,14 +167,19 @@ int CameraMediaSourceOnAndroid::release() {
 
     {
         std::lock_guard<std::mutex> lockGuard(mStatLock);
-        MAKE_MSG(msg, kMsgReleaseSource);
-        POST(msg.msg);
+        MAKE_MSG_SYNC(msg, kMsgReleaseSource, nullptr);
+        POSTANDWAIT(msg.msg);
 
         mRenderQueue.requestExit(true);
 
         if (mRenderEngine) {
             mRenderEngine->release();
             mRenderEngine = nullptr;
+        }
+
+        if (mMesh) {
+            delete mMesh;
+            mMesh = nullptr;
         }
 
     }
@@ -208,6 +206,8 @@ int CameraMediaSourceOnAndroid::setParameter(int key, void *obj) {
             ret = 0;
             break;
     }
+
+    mMetaData->dumpToLog();
     return ret;
 }
 
@@ -280,6 +280,8 @@ void CameraMediaSourceOnAndroid::process(MessageQueue::Msg *msg) {
                 mFbo = 0;
             }
 
+            delete mTexPool;
+            mTexPool = nullptr;
             mRenderEngine->destroySurface(mEglSurface);
 
             mRenderEngine->release();
@@ -298,6 +300,7 @@ void CameraMediaSourceOnAndroid::process(MessageQueue::Msg *msg) {
 }
 
 int CameraMediaSourceOnAndroid::onFrameAvailable(int64_t timestamp, float *matrix) {
+    SCOPEDDEBUG();
     mCameraTex.setMatrix(matrix);
     MAKE_MSG(msg, kMsgOnFrameAvailable);
     POST(msg.msg);
@@ -348,27 +351,34 @@ void CameraMediaSourceOnAndroid::createRenderEngine() {
 void CameraMediaSourceOnAndroid::draw() {
     SCOPEDDEBUG();
     JNIHelper helper;
-    static jclass jcls = helper.env()->GetObjectClass(mCamJava.mObj);
-    static jmethodID jupdateImage = jcls ? helper.env()->GetMethodID(jcls, "updateImage", "()J")
-                                         : nullptr;
 
     long ts = 0;
 
-    if (jupdateImage) {
-        ts = helper.env()->CallLongMethod(mCamJava.mObj, jupdateImage);
+    {
+        std::lock_guard<std::mutex> lock_guard(mSyncLock);
+
+        if (mCamJava.mObj) {
+            ts = J4AC_com_media_gankers_medianative_CameraWrapper__updateImage(helper.env(),
+                                                                               mCamJava.mObj);
+        }
+
+        if (status() != kStarted) {
+            SCOPEDDEBUG();
+            return;
+        }
     }
 
-    if (!ts) {
+    if (!ts || mTexPool == nullptr) {
         SCOPEDDEBUG();
         return;
     }
 
-    if (status() != kStarted) {
-        SCOPEDDEBUG();
+    TexBuffer *texBuffer = mTexPool->pollAsTexBuffer(200);
+
+    if (!texBuffer) {
+        ALOGE("No enough texture buffer, skip frame");
         return;
     }
-
-    TexBuffer *texBuffer = mTexPool->pollAsTexBuffer();
 
     glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texBuffer->texId(),
@@ -383,14 +393,9 @@ void CameraMediaSourceOnAndroid::draw() {
 int CameraMediaSourceOnAndroid::stopInternal() {
     SCOPEDDEBUG();
     JNIHelper helper;
-    static jclass jcls = helper.env()->FindClass("com/media/gankers/medianative/CameraWrapper");
-    static jmethodID jrelease = jcls ? helper.env()->GetMethodID(jcls, "release", "()V") : nullptr;
 
     if (mCamJava.mObj) {
-        if (jrelease) {
-            helper.env()->CallVoidMethod(mCamJava.mObj, jrelease);
-            mCamJava.setObj(nullptr);
-        }
+        J4AC_com_media_gankers_medianative_CameraWrapper__release(helper.env(), mCamJava.mObj);
     }
 
     return 0;

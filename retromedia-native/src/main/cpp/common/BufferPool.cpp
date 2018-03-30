@@ -99,7 +99,7 @@ Buffer *BufferPool::pollTime(long waitMs) {
             buffer = mEmptyQueue.front();
             mEmptyQueue.pop_front();
         }else {
-            mEmptyQueueCond.wait_for(lock, std::chrono::duration<int64_t, std::micro>(waitMs * 1000));
+            mEmptyQueueCond.wait_for(lock, std::chrono::duration<int64_t, std::milli>(waitMs));
             if(!mEmptyQueue.empty()) {
                 buffer = mEmptyQueue.front();
                 mEmptyQueue.pop_front();
@@ -110,6 +110,8 @@ Buffer *BufferPool::pollTime(long waitMs) {
     if (buffer) {
         buffer->addRef();
     }
+
+    ALOGI("wait timt %ld %p", waitMs, buffer);
     return buffer;
 }
 

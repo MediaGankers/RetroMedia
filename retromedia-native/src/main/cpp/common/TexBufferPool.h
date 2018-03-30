@@ -17,6 +17,10 @@ public:
         return (TexBuffer *)poll();
     }
 
+    inline TexBuffer *pollAsTexBuffer(long ms) {
+        return (TexBuffer *)pollTime(ms);
+    }
+
 protected:
     Buffer *createBuffer();
 

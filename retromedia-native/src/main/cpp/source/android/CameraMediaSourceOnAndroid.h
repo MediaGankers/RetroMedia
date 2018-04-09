@@ -71,6 +71,8 @@ public:
     void draw();
 
     int stopInternal();
+
+    void drawWithMatrix(jlong ts, jfloat *matrix);
 };
 
 

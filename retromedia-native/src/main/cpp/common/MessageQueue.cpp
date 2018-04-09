@@ -25,9 +25,10 @@ MessageQueue::Msg MessageQueue::pollTime(int64_t ms) {
     MsgBox box;
     box.msg.hwd = nullptr;
     std::unique_lock<std::mutex> lock_guard(mLock);
+    SCOPEDDEBUG();
     QueueList::iterator it = MQUEUE()->begin();
     if (it == MQUEUE()->end()) {
-        mCond.wait_for(lock_guard, std::chrono::duration<int64_t, std::micro>(ms * 1000));
+        mCond.wait_for(lock_guard, std::chrono::duration<int64_t, std::milli>(ms));
         it = MQUEUE()->begin();
         if (it != MQUEUE()->end()) {
             box = *it;
@@ -45,6 +46,7 @@ MessageQueue::Msg MessageQueue::peek() {
 }
 
 MessageQueue::MessageQueue(int size, bool haveThread) {
+    SCOPEDDEBUG();
     mSize = size;
     mExit = false;
     mFlush = true;
@@ -59,14 +61,14 @@ MessageQueue::MessageQueue(int size, bool haveThread) {
 }
 
 int MessageQueue::size() {
-    std::lock_guard<std::mutex> lock_guard(mLock);
+    std::unique_lock<std::mutex> lock_guard(mLock);
     return MQUEUE()->size();
 }
 
 bool MessageQueue::post(MessageQueue::Msg &msg) {
     SCOPEDDEBUG();
     bool postDone = false;
-    std::lock_guard<std::mutex> lock_guard(mLock);
+    std::unique_lock<std::mutex> lock_guard(mLock);
     if (MQUEUE()->size() < mSize && !mExit) {
         MsgBox box;
         box.msg = msg;
@@ -95,7 +97,7 @@ void MessageQueue::requestExit(bool sync) {
     mExit = true;
     if (sync && mThread) {
         {
-            std::lock_guard<std::mutex> lock_guard(mLock);
+            std::unique_lock<std::mutex> lock_guard(mLock);
             mCond.notify_all();
         }
         mThread->join();
@@ -108,6 +110,7 @@ void MessageQueue::requestExit(bool sync) {
 }
 
 MessageQueue::~MessageQueue() {
+    SCOPEDDEBUG();
     requestExit(true);
 
     if (mThread) {
@@ -121,7 +124,7 @@ void MessageQueue::loop() {
 
     while (!mExit) {
         MsgBox box;
-        box.msg = poll();
+        box.msg = pollTime(500);
         if (box.msg.hwd) {
             box.msg.hwd->process(&box.msg);
         }

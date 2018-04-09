@@ -1,3 +1,4 @@
+#define LOG_TAG "RenderEngine"
 #include <gl/Rect.h>
 #include <gl/Region.h>
 #include <gl/util.h>
@@ -84,7 +85,11 @@ RenderEngine* RenderEngine::create(EGLContext ctx) {
 #endif
             EGL_NONE, EGL_NONE
     };
-    EGLContext ctxt = eglCreateContext(display, config, ctx == EGL_NO_CONTEXT ? nullptr : ctx, contextAttributes);
+
+    EGLContext sharedCtx = ctx == EGL_NO_CONTEXT ? nullptr : ctx;
+    EGLContext ctxt = eglCreateContext(display, config, sharedCtx, contextAttributes);
+
+    ALOGD("Using sharedContext %p", sharedCtx);
 
     // if can't create a GL context, we can only abort.
     LOG_ALWAYS_FATAL_IF(ctxt==EGL_NO_CONTEXT, "EGLContext creation failed");
@@ -148,6 +153,7 @@ RenderEngine::RenderEngine() : mEGLContext(EGL_NO_CONTEXT) {
 
 RenderEngine::~RenderEngine() {
     SCOPEDDEBUG();
+    eglDestroyContext(mDefaultdpy, mEGLContext);
 }
 
 void RenderEngine::setEGLHandles(EGLConfig config, EGLContext ctxt) {
@@ -464,6 +470,31 @@ EGLConfig RenderEngine::chooseEglConfig(EGLDisplay display, int format) {
         eglDestroySurface(mDefaultdpy, surface);
     }
 
+    RenderEngine *RenderEngine::createWithContext() {
+        RenderEngine *sr = getSharedRenderEngine();
+
+        if (sr != nullptr) {
+            sr = RenderEngine::create(sr->getEGLContext());
+        }else {
+            sr = nullptr;
+        }
+        return sr;
+    }
+
+    EGLSurface RenderEngine::createSurface(EGLNativeWindowType pVoid) {
+        return eglCreateWindowSurface(mDefaultdpy, mEGLConfig, pVoid, nullptr);
+    }
+
+    void RenderEngine::swapBuffer(EGLSurface pVoid) {
+        if (pVoid != nullptr) {
+            eglSwapBuffers(mDefaultdpy, pVoid);
+        }
+    }
+
+    RenderEngine *getSharedRenderEngine() {
+        static RenderEngine *sEngine = RenderEngine::create(nullptr);
+        return sEngine;
+    }
 // ---------------------------------------------------------------------------
 }; // namespace android
 // ---------------------------------------------------------------------------

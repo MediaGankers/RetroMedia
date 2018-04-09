@@ -111,7 +111,6 @@ Buffer *BufferPool::pollTime(long waitMs) {
         buffer->addRef();
     }
 
-    ALOGI("wait timt %ld %p", waitMs, buffer);
     return buffer;
 }
 

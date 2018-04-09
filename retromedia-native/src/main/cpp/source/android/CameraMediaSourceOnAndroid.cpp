@@ -1,7 +1,7 @@
 //
 // Created by chao on 2018/3/26.
 //
-
+#define LOG_TAG "CameraMediaSourceOnAndroid"
 #include <BaseType.h>
 #include <gl/RenderEngine.h>
 #include <DebugHelper.h>
@@ -240,6 +240,7 @@ int CameraMediaSourceOnAndroid::getOESTexture() {
 
 void CameraMediaSourceOnAndroid::process(MessageQueue::Msg *msg) {
 
+    SCOPEDDEBUG();
     MessagePrivate *box = (MessagePrivate *) msg->data;
     switch (msg->what) {
         case kMsgCreateRenderEngine: {
@@ -309,22 +310,22 @@ int CameraMediaSourceOnAndroid::onFrameAvailable(int64_t timestamp, float *matri
 
 void CameraMediaSourceOnAndroid::createRenderEngine() {
 
-    mRenderEngine = openGl::RenderEngine::create(EGL_NO_CONTEXT);
+    mRenderEngine = openGl::RenderEngine::createWithContext();
 
     mEglSurface = mRenderEngine->createSurface(1, 1);
 
     mRenderEngine->makeCurrent(mEglSurface);
 
-    mRenderEngine->setupLayerBlending(false, false, 1.0f);
+    //mRenderEngine->setupLayerBlending(false, false, 1.0f);
 
     mMesh = new openGl::Mesh(openGl::Mesh::TRIANGLE_FAN, 4, 2, 2);
 
     openGl::Mesh::VertexArray<openGl::vec2> position = mMesh->getPositionArray<openGl::vec2>();
     openGl::Transform tr;
-    position[0] = tr.transform(-1, 1);
-    position[1] = tr.transform(-1, -1);
+    position[0] = tr.transform(-1, -1);
+    position[1] = tr.transform(1, -1);
     position[2] = tr.transform(1, 1);
-    position[3] = tr.transform(1, -1);
+    position[3] = tr.transform(-1, 1);
 
     tr.reset();
     openGl::Mesh::VertexArray<openGl::vec2> coord = mMesh->getTexCoordArray<openGl::vec2>();
@@ -352,42 +353,17 @@ void CameraMediaSourceOnAndroid::draw() {
     SCOPEDDEBUG();
     JNIHelper helper;
 
-    long ts = 0;
-
     {
         std::lock_guard<std::mutex> lock_guard(mSyncLock);
 
         if (mCamJava.mObj) {
-            ts = J4AC_com_media_gankers_medianative_CameraWrapper__updateImage(helper.env(),
-                                                                               mCamJava.mObj);
-        }
-
-        if (status() != kStarted) {
             SCOPEDDEBUG();
-            return;
+            J4AC_com_media_gankers_medianative_CameraWrapper__updateImage(helper.env(),
+                                                                          mCamJava.mObj);
         }
     }
 
-    if (!ts || mTexPool == nullptr) {
-        SCOPEDDEBUG();
-        return;
-    }
 
-    TexBuffer *texBuffer = mTexPool->pollAsTexBuffer(200);
-
-    if (!texBuffer) {
-        ALOGE("No enough texture buffer, skip frame");
-        return;
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texBuffer->texId(),
-                           0);
-    mRenderEngine->drawMesh(*mMesh);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    deliver(texBuffer, StreamType::kStreamVideo);
-    texBuffer->decRef();
 }
 
 int CameraMediaSourceOnAndroid::stopInternal() {
@@ -404,5 +380,42 @@ int CameraMediaSourceOnAndroid::stopInternal() {
 CameraMediaSourceOnAndroid::~CameraMediaSourceOnAndroid() {
     SCOPEDDEBUG();
     release();
+}
+
+void CameraMediaSourceOnAndroid::drawWithMatrix(jlong ts, jfloat *matrix) {
+
+    // already locked
+
+    SCOPEDDEBUG();
+    if (status() != kStarted) {
+        SCOPEDDEBUG();
+        return;
+    }
+
+    if (!ts || mTexPool == nullptr || matrix == nullptr) {
+        SCOPEDDEBUG();
+        return;
+    }
+
+    mCameraTex.setMatrix(matrix);
+    TexBuffer *texBuffer = mTexPool->pollAsTexBuffer(200);
+
+    if (!texBuffer) {
+        ALOGE("No enough texture buffer, skip frame");
+        return;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texBuffer->texId(),
+                           0);
+    mRenderEngine->setupLayerTexturing(mCameraTex);
+    glViewport(0, 0, 1280, 720);
+    mRenderEngine->drawMesh(*mMesh);
+    //mRenderEngine->clearWithColor(rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, 1.f);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    ALOGI("setupLayerTexture on camera tex %d w %d h %d ", texBuffer->texId(), texBuffer->width(), texBuffer->height());
+
+    deliver(texBuffer, StreamType::kStreamVideo);
+    texBuffer->decRef();
 }
 

@@ -3,6 +3,8 @@ package com.media.gankers.medianative;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 
+import java.security.Policy;
+
 /**
  * Created by chao on 2018/3/26.
  */
@@ -16,6 +18,9 @@ public class CameraWrapper {
     private static int mFrontCamId = -1;
     private static int mBackCamId = -1;
     private static String mErrorMsg = "null";
+
+    private static int mWidth = 1280;
+    private static int mHeight = 720;
 
     public CameraWrapper(long nativeObj) {
         mNativeObject = nativeObj;
@@ -124,6 +129,7 @@ public class CameraWrapper {
     }
 
     private native void  nativeFrameAvailable(long ts, float[] matrix);
+    private native void drawFrameWithMatrix(long ts, float[] matrix);
 
     private long updateImage() {
         long ret = 0;
@@ -131,12 +137,15 @@ public class CameraWrapper {
             try {
                 mSurfaceTexture.updateTexImage();
                 ret = mSurfaceTexture.getTimestamp();
+                mSurfaceTexture.getTransformMatrix(mMatrix);
+
+                drawFrameWithMatrix(ret, mMatrix);
             }catch (Throwable t) {
                 mErrorMsg = "(updateTexImage failed)";
                 mErrorMsg += t.getMessage();
             }
         }
-        return ret;
+        return 0;
     }
 
     public boolean startPreview(int tex) {
@@ -154,6 +163,11 @@ public class CameraWrapper {
                 });
 
                 if (mCamera != null) {
+                    Camera.Parameters p =  mCamera.getParameters();
+                    p.setPreviewSize(mWidth, mHeight);
+                    p.setPreviewFrameRate(30);
+
+                    mCamera.setParameters(p);
                     mCamera.setPreviewTexture(mSurfaceTexture);
                     mCamera.startPreview();
                     ret = true;
@@ -169,8 +183,10 @@ public class CameraWrapper {
     public void release() {
         if (mCamera != null) {
             try {
+                mCamera.setPreviewTexture(null);
                 mCamera.stopPreview();
                 mCamera.release();
+                mNativeObject = 0;
                 mCamera = null;
             }catch (Throwable t) {
                 //ignore

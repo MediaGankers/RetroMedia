@@ -48,6 +48,8 @@ protected:
 public:
     static RenderEngine* create(EGLContext ctx = nullptr);
 
+    static RenderEngine* createWithContext();
+
     static EGLConfig chooseEglConfig(EGLDisplay display, int format);
 
     void makeCurrent(EGLSurface surface);
@@ -102,6 +104,7 @@ public:
     virtual void drawMesh(const Mesh& mesh) = 0;
 
     // queries
+
     virtual size_t getMaxTextureSize() const = 0;
     virtual size_t getMaxViewportDims() const = 0;
 
@@ -110,10 +113,14 @@ public:
 
     void release();
 
+    EGLSurface createSurface(EGLNativeWindowType pVoid);
+
+    void swapBuffer(EGLSurface pVoid);
 };
 
+   RenderEngine *getSharedRenderEngine();
 // ---------------------------------------------------------------------------
-}; // namespace CCStone
+}; // namespace openGl
 // ---------------------------------------------------------------------------
 
 #endif /* SF_RENDERENGINE_H_ */

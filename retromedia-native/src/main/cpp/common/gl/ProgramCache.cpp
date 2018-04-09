@@ -65,7 +65,7 @@ ANDROID_SINGLETON_STATIC_INSTANCE(ProgramCache)
 ProgramCache::ProgramCache() {
     // Until surfaceflinger has a dependable blob cache on the filesystem,
     // generate shaders on initialization so as to avoid jank.
-    primeCache();
+    //primeCache();
 }
 
 ProgramCache::~ProgramCache() {

@@ -27,7 +27,7 @@ Buffer *TexBufferPool::createBuffer() {
 TexBuffer::TexBuffer(Buffer::BufferRecycler *r) : BufferOnBufferPool(r) {}
 
 
-int TexBuffer::texId() {
+int TexBuffer::texId() const{
     return mTex;
 }
 
@@ -58,14 +58,22 @@ TexBuffer::~TexBuffer() {
     }
 }
 
-int TexBuffer::height() {
+int TexBuffer::height() const{
     return mHeight;
 }
 
-int TexBuffer::width() {
+int TexBuffer::width() const{
     return mWidth;
 }
 
-int TexBuffer::texType() {
+int TexBuffer::texType() const{
     return mTexType;
+}
+
+bool TexBuffer::createTextureOES(int w, int h) {
+    mTex = GlUtils::createTexture2d(w, h, nullptr);
+    mWidth = w;
+    mHeight = h;
+    mTexType = GL_TEXTURE_EXTERNAL_OES;
+    return mTex > 0;
 }

@@ -9,6 +9,7 @@
 #include "j4a/i_deliver.h"
 
 JavaDeliver::JavaDeliver(jobject obj):mObj(obj) {
+    SCOPEDDEBUG();
 }
 
 int JavaDeliver::deliver(Buffer *buffer, StreamType type) {
@@ -17,6 +18,8 @@ int JavaDeliver::deliver(Buffer *buffer, StreamType type) {
     
     if (jbuffer) {
         J4AC_com_media_gankers_medianative_IDeliver__deliver(helper.env(), mObj.mObj, jbuffer, (jint)type);
+
+     JNIHelper::LocalRefObject l(jbuffer);
     }
     return 0;
 }

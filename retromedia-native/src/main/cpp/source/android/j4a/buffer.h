@@ -26,6 +26,8 @@
 __BEGIN_DECLS
 #include "j4a/j4a_base.h"
 
+void J4AC_com_media_gankers_medianative_Buffer__release(JNIEnv *env, jobject obj);
+void J4AC_com_media_gankers_medianative_Buffer__release__catchAll(JNIEnv *env, jobject obj);
 jobject J4AC_com_media_gankers_medianative_Buffer__Buffer(JNIEnv *env, jlong nativeObj);
 jobject J4AC_com_media_gankers_medianative_Buffer__Buffer__catchAll(JNIEnv *env, jlong nativeObj);
 jobject J4AC_com_media_gankers_medianative_Buffer__Buffer__asGlobalRef__catchAll(JNIEnv *env, jlong nativeObj);

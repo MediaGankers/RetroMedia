@@ -1,7 +1,11 @@
 #ifndef CCSTONE_OPENGL_UTIL_H_
 #define CCSTONE_OPENGL_UTIL_H_
 #include <stdio.h>
+#include <libavutil/time.h>
 #include "log_defs.h"
+#include <mutex>
+#include <unistd.h>
+
 namespace openGl {
 
 #define NO_ERROR 0
@@ -15,11 +19,7 @@ namespace openGl {
 
 #ifndef CC_LIKELY
 #define CC_LIKELY(exper) exper
-#endif 
-
-#ifndef ANDROID_SINGLETON_STATIC_INSTANCE
-#define ANDROID_SINGLETON_STATIC_INSTANCE(inst)
-#endif 
+#endif
 
 #ifndef EGL_FRAMEBUFFER_TARGET_ANDROID
 #define EGL_FRAMEBUFFER_TARGET_ANDROID 0
@@ -70,19 +70,46 @@ typedef int32_t status_t;
 
 inline nsecs_t systemTime() 
 {
-    return 0;
+    struct timeval time;
+    gettimeofday(&time,NULL);
+
+    nsecs_t interval = 0;
+    interval = 1000000*(time.tv_sec - time.tv_sec) + time.tv_usec;
+    return interval * 1000;
 }
 
 template <class T>
 class Singleton {
-    public:
+public:
   static  T& getInstance() {
-      return *(new T);
-  } 
+      T *instance = sInstance;
+      std::unique_lock<std::mutex> lock(sLock);
+      if (instance == nullptr) {
+          instance = new T();
+          sInstance = instance;
+      }
+      return *sInstance;
+  }
+
+protected:
+    Singleton(){}
+    ~Singleton(){}
+
+private:
+    Singleton(const Singleton&);
+    Singleton& operator = (const Singleton&);
+    static std::mutex sLock;
+    static T* sInstance;
 };
 
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 #ifndef ANDROID_SINGLETON_STATIC_INSTANCE
-#define ANDROID_SINGLETON_STATIC_INSTANCE(inst) 
+#define ANDROID_SINGLETON_STATIC_INSTANCE(TYPE)                 \
+    template<typename TYPE> std::mutex Singleton<TYPE>::sLock; \
+    template<> TYPE* Singleton< TYPE >::sInstance(nullptr);   \
+    template class Singleton< TYPE >;
 #endif
 }
 #endif

@@ -19,12 +19,13 @@ void GlUtils::deleteTexture(int i, GLuint *tex) {
 }
 
 GLuint GlUtils::createTexture2d(int w, int h, void *data) {
-    assert(w != 0 && h != 0);
     GLuint texID = createTexture();
 
-    glBindTexture(GL_TEXTURE_2D, texID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    setTextureParam(GL_TEXTURE_2D, GL_LINEAR, GL_CLAMP_TO_EDGE);
+    if (w != 0 && h != 0 ) {
+        glBindTexture(GL_TEXTURE_2D, texID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        setTextureParam(GL_TEXTURE_2D, GL_LINEAR, GL_CLAMP_TO_EDGE);
+    }
     return texID;
 }
 

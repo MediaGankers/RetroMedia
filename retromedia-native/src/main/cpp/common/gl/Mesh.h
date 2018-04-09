@@ -63,12 +63,13 @@ public:
     // return stride in floats
     size_t getStride() const;
 
+    float* getPositions();
+
 private:
     Mesh(const Mesh&);
     Mesh& operator = (const Mesh&);
     Mesh const& operator = (const Mesh&) const;
 
-    float* getPositions();
     float* getTexCoords();
     float* mVertices;
     size_t mVertexCount;
@@ -77,7 +78,6 @@ private:
     size_t mStride;
     Primitive mPrimitive;
 };
-
 
 } /* namespace android */
 #endif /* SF_RENDER_ENGINE_MESH_H */

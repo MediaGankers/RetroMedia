@@ -71,6 +71,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/source/android/j4a/i_deliver.c
              src/main/cpp/source/android/j4a/buffer.c
              src/main/cpp/source/android/j4a/j4a_base.c
+             src/main/cpp/source/TextureDrawer.cpp
              src/main/cpp/common/Reference.cpp
              src/main/cpp/common/MessageQueue.cpp
              src/main/cpp/common/DebugHelper.cpp
@@ -126,7 +127,7 @@ find_library( # Sets the name of the path variable.
 
               # Specifies the name of the NDK library that
               # you want CMake to locate.
-              log  gnu_stl)
+              log  gnu_stl android)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
@@ -137,4 +138,4 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} libffmpeg libyuv GLESv2 EGL GLESv1_CM)
+                       ${log-lib} libffmpeg libyuv GLESv2 EGL GLESv1_CM android)

@@ -25,12 +25,18 @@ typedef struct J4AC_com_media_gankers_medianative_Buffer {
     jclass id;
 
     jmethodID constructor_Buffer;
+    jmethodID release_Buffer;
 } J4AC_com_media_gankers_medianative_Buffer;
 static J4AC_com_media_gankers_medianative_Buffer class_J4AC_com_media_gankers_medianative_Buffer;
 
 jobject J4AC_com_media_gankers_medianative_Buffer__Buffer(JNIEnv *env, jlong nativeObj)
 {
     return (*env)->NewObject(env, class_J4AC_com_media_gankers_medianative_Buffer.id, class_J4AC_com_media_gankers_medianative_Buffer.constructor_Buffer, nativeObj);
+}
+
+void J4AC_com_media_gankers_medianative_Buffer__release(JNIEnv *env, jobject obj)
+{
+    (*env)->CallVoidMethod(env, obj, class_J4AC_com_media_gankers_medianative_Buffer.release_Buffer);
 }
 
 jobject J4AC_com_media_gankers_medianative_Buffer__Buffer__catchAll(JNIEnv *env, jlong nativeObj)
@@ -41,6 +47,16 @@ jobject J4AC_com_media_gankers_medianative_Buffer__Buffer__catchAll(JNIEnv *env,
     }
 
     return ret_object;
+}
+
+void J4AC_com_media_gankers_medianative_Buffer__release__catchAll(JNIEnv *env, jobject obj)
+{
+    J4AC_com_media_gankers_medianative_Buffer__release(env, obj);
+    if (J4A_ExceptionCheck__catchAll(env)) {
+        return;
+    }
+
+    return;
 }
 
 jobject J4AC_com_media_gankers_medianative_Buffer__Buffer__asGlobalRef__catchAll(JNIEnv *env, jlong nativeObj)
@@ -77,6 +93,13 @@ int J4A_loadClass__J4AC_com_media_gankers_medianative_Buffer(JNIEnv *env)
     sign = "com/media/gankers/medianative/Buffer";
     class_J4AC_com_media_gankers_medianative_Buffer.id = J4A_FindClass__asGlobalRef__catchAll(env, sign);
     if (class_J4AC_com_media_gankers_medianative_Buffer.id == NULL)
+        goto fail;
+
+    class_id = class_J4AC_com_media_gankers_medianative_Buffer.id;
+    name     = "release";
+    sign     = "()V";
+    class_J4AC_com_media_gankers_medianative_Buffer.release_Buffer = J4A_GetMethodID__catchAll(env,class_id, name, sign);
+    if (class_J4AC_com_media_gankers_medianative_Buffer.release_Buffer == NULL)
         goto fail;
 
     class_id = class_J4AC_com_media_gankers_medianative_Buffer.id;

@@ -41,15 +41,17 @@ public:
 
     bool createTexture(int w, int h, void *data = NULL);
 
-    int texId();
+    bool createTextureOES(int w, int h);
+
+    int texId()const;
 
     int type()const;
 
-    int width();
+    int width()const;
 
-    int height();
+    int height()const;
 
-    int texType();
+    int texType()const;
 
 protected:
     ~TexBuffer();

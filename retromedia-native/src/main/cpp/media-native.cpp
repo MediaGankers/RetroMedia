@@ -1,8 +1,10 @@
 #include <jni.h>
+#include <android/native_window_jni.h>
 #include <string>
 #include <log_defs.h>
 #include <JNIHelper.h>
 #include <DebugHelper.h>
+#include <source/TextureDrawer.h>
 #include "JavaDeliver.h"
 #include "VideoSource.h"
 #include "Decoder.h"
@@ -13,7 +15,7 @@
 #include "j4a/camera_wrapper.h"
 #include "j4a/i_deliver.h"
 #include "j4a/buffer.h"
-
+#include "common/gl/RenderEngine.h"
 extern "C"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -175,7 +177,6 @@ Java_com_media_gankers_medianative_Buffer_addRef(JNIEnv *env, jobject instance) 
 
     if (nativeBuffer) {
         nativeBuffer->addRef();
-        ALOGI("Native Buffer cnt %d this %p",nativeBuffer->count(), nativeBuffer);
     }
 }extern "C"
 JNIEXPORT void JNICALL
@@ -552,4 +553,146 @@ Java_com_media_gankers_medianative_TextureBuffer_get(JNIEnv *env, jclass type, j
         obj = env->NewObject(type, mid, tb);
     }
     return obj;
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_com_media_gankers_medianative_TextureDrawer_makeCurrent(JNIEnv *env, jobject instance,
+                                                             jobject obj) {
+
+    // TODO
+    jclass cls = env->GetObjectClass(instance);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+    jfieldID nativeField2 = env->GetFieldID(cls, "mNativeWindowSurface", "J");
+    TextureDrawer *drawer = (TextureDrawer *)(env->GetLongField(instance, nativeField));
+
+    if (drawer) {
+        ANativeWindow *oldWindow = (ANativeWindow *)(env->GetLongField(instance, nativeField2));
+        ANativeWindow *window = nullptr;
+
+        if (obj != nullptr) {
+            window = ANativeWindow_fromSurface(env, obj);
+            ANativeWindow_acquire(window);
+        }
+
+        SCOPEDDEBUG();
+        drawer->makeCurrent(window);
+        if (oldWindow) {
+            ANativeWindow_release(oldWindow);
+        }
+
+        env->SetLongField(instance, nativeField2, (jlong)(window));
+    }else {
+        return ERRNUM();
+    }
+
+    return 0;
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_com_media_gankers_medianative_TextureDrawer_draw(JNIEnv *env, jobject instance, jobject obj) {
+
+    // TODO
+    jclass cls = env->GetObjectClass(instance);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+    TextureDrawer *drawer = (TextureDrawer *)(env->GetLongField(instance, nativeField));
+
+    int ret = ERRNUM();
+    if (drawer && obj) {
+        jclass clz = env->GetObjectClass(obj);
+        jfieldID nativeField = env->GetFieldID(clz, "mNativeObject", "J");
+        Buffer *nativeBuffer = nullptr;
+        nativeBuffer = (Buffer *)env->GetLongField(obj, nativeField);
+        TexBuffer *buffer = TexBuffer::get(nativeBuffer);
+        if (buffer) {
+           ret = drawer->draw(*buffer);
+        }
+    }
+
+    return ret;
+
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_com_media_gankers_medianative_TextureDrawer_updateWindow(JNIEnv *env, jobject instance,
+                                                              jint arg1, jint arg2) {
+
+    // TODO
+    jclass cls = env->GetObjectClass(instance);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+    TextureDrawer *drawer = (TextureDrawer *)(env->GetLongField(instance, nativeField));
+
+    if (drawer) {
+        drawer->updateWindowSize(arg1, arg2);
+    }
+    return 0;
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_media_gankers_medianative_TextureDrawer_release(JNIEnv *env, jobject instance) {
+
+    // TODO
+    jclass cls = env->GetObjectClass(instance);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+    jfieldID nativeField2 = env->GetFieldID(cls, "mNativeWindowSurface", "J");
+    TextureDrawer *drawer = (TextureDrawer *)(env->GetLongField(instance, nativeField));
+    ANativeWindow *window = (ANativeWindow *)(env->GetLongField(instance, nativeField2));
+
+    if (drawer) {
+        if (window) {
+            ANativeWindow_release(window);
+        }
+
+        delete drawer;
+        env->SetLongField(instance, nativeField, (jlong)(0));
+        env->SetLongField(instance, nativeField2, (jlong)(0));
+    }
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_media_gankers_medianative_TextureDrawer_initNative(JNIEnv *env, jobject instance) {
+
+    // TODO
+
+    jclass cls = env->GetObjectClass(instance);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+    TextureDrawer *drawer = (TextureDrawer *)(env->GetLongField(instance, nativeField));
+
+    if (drawer == nullptr) {
+        drawer = new TextureDrawer;
+        int ret = drawer->init();
+        if (ret) {
+            ALOGE("Create TextureDrawer failed ret %d", ret);
+            delete drawer;
+            drawer = nullptr;
+            return;
+        }
+    }
+
+    env->SetLongField(instance, nativeField, (jlong)(drawer));
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_media_gankers_medianative_OpenGlEnv_initGlEnv(JNIEnv *env, jobject instance) {
+
+    // TODO
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_media_gankers_medianative_OpenGlEnv_deInitGlEnv(JNIEnv *env, jobject instance) {
+
+    // TODO
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_media_gankers_medianative_CameraWrapper_drawFrameWithMatrix(JNIEnv *env, jobject instance,
+                                                                     jlong ts,
+                                                                     jfloatArray matrix_) {
+    SCOPEDDEBUG();
+    jfloat *matrix = env->GetFloatArrayElements(matrix_, NULL);
+
+    // TODO
+    jclass cls = env->GetObjectClass(instance);
+    jfieldID nativeField = env->GetFieldID(cls, "mNativeObject", "J");
+
+    CameraMediaSourceOnAndroid *source = (CameraMediaSourceOnAndroid *) (env->GetLongField(instance, nativeField));
+
+    if (source) {
+        source->drawWithMatrix(ts, matrix);
+    }
+
+    env->ReleaseFloatArrayElements(matrix_, matrix, 0);
 }

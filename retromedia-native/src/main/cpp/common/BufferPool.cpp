@@ -53,7 +53,7 @@ BufferPool::~BufferPool() {
             bufferOnQueue->resetRecycler(&defaultRecycler);
         }
 
-        ALOGI("Release AVBuffer %p [%s]", bufferOnQueue, laterRelease ? "LaterRelease" : "Done");
+        ALOGI("Release Buffer %p [%s]", bufferOnQueue, laterRelease ? "LaterRelease" : "Done");
         if (!laterRelease) {
             delete bufferOnQueue;
         }
@@ -147,5 +147,5 @@ void BufferPool::BufferOnBufferPool::resetRecycler(Buffer::BufferRecycler *r) {
 }
 
 BufferPool::BufferOnBufferPool::~BufferOnBufferPool() {
-
+    ALOGI("~Dtor Buffer %p", this);
 }

@@ -1,6 +1,8 @@
 package com.media.gankers.medianative;
 
+import android.annotation.TargetApi;
 import android.opengl.GLES20;
+import android.os.Build;
 import android.os.Looper;
 
 /**
@@ -17,9 +19,10 @@ class OpenGlEnv implements Runnable{
         mThread.start();
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void requestExit() {
         if (mLoop != null) {
-            mLoop.quit();
+            mLoop.quitSafely();
             if (mThread != null) {
                 try {
                     mThread.join();

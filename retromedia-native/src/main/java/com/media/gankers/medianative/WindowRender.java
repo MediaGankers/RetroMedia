@@ -21,6 +21,7 @@ public class WindowRender extends ISink implements SurfaceHolder.Callback {
     private OpenGlEnv mGlEnv;
     private SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
+    private Object mFence = new Object();
     TextureBuffer mTexBuffer;
 
     TextureDrawer mDrawer;
@@ -131,10 +132,12 @@ public class WindowRender extends ISink implements SurfaceHolder.Callback {
 
     @Override
     protected void processVideo(Buffer buffer) {
-        if (mHandler != null) {
-            Message msg = mHandler.obtainMessage(MSG_RENDER_FRAME);
-            msg.obj = new Buffer(buffer);
-            mHandler.sendMessage(msg);
+        synchronized (mFence) {
+            if (mGlEnv != null && mHandler != null) {
+                Message msg = mHandler.obtainMessage(MSG_RENDER_FRAME);
+                msg.obj = new Buffer(buffer);
+                mHandler.sendMessage(msg);
+            }
         }
     }
 
@@ -188,13 +191,21 @@ public class WindowRender extends ISink implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        mHandler.sendEmptyMessage(MSG_SURFACE_DESTROY);
+        synchronized (mFence) {
+            if (mGlEnv != null) {
+                mHandler.sendEmptyMessage(MSG_SURFACE_DESTROY);
+            }
+        }
     }
 
-    public void destroy() {
-        mHandler.sendEmptyMessage(MSG_SURFACE_DESTROY);
-        mGlEnv.requestExit();
-        mGlEnv = null;
+    public  void destroy() {
+        synchronized (mFence) {
+            if (mGlEnv != null) {
+                mHandler.sendEmptyMessage(MSG_SURFACE_DESTROY);
+                mGlEnv.requestExit();
+                mGlEnv = null;
+            }
+        }
     }
 
     @Override

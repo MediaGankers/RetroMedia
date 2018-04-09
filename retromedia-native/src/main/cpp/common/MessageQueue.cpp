@@ -124,7 +124,7 @@ void MessageQueue::loop() {
 
     while (!mExit) {
         MsgBox box;
-        box.msg = pollTime(500);
+        box.msg = poll();
         if (box.msg.hwd) {
             box.msg.hwd->process(&box.msg);
         }

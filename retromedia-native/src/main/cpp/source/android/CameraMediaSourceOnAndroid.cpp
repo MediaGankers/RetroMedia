@@ -220,7 +220,7 @@ int CameraMediaSourceOnAndroid::reset() {
 }
 
 CameraMediaSourceOnAndroid::CameraMediaSourceOnAndroid() : CameraMediaSource(),
-                                                           mRenderQueue(100, true) {
+                                                           mRenderQueue(10, true) {
     SCOPEDDEBUG();
     mRenderEngine = nullptr;
     mTexPool = nullptr;
@@ -302,6 +302,7 @@ void CameraMediaSourceOnAndroid::process(MessageQueue::Msg *msg) {
 
 int CameraMediaSourceOnAndroid::onFrameAvailable(int64_t timestamp, float *matrix) {
     SCOPEDDEBUG();
+    ALOGI("STONE onFrameAvailable %p", this);
     mCameraTex.setMatrix(matrix);
     MAKE_MSG(msg, kMsgOnFrameAvailable);
     POST(msg.msg);
@@ -344,7 +345,7 @@ void CameraMediaSourceOnAndroid::createRenderEngine() {
 
     w = w > 0 ? w : 1280;
     h = h > 0 ? h : 720;
-    mTexPool = new TexBufferPool(10, w, h, "CameraTexPool");
+    mTexPool = new TexBufferPool(1, w, h, "CameraTexPool");
 
     GlUtils::createFrameBuffer(1, &mFbo);
 }
@@ -410,12 +411,14 @@ void CameraMediaSourceOnAndroid::drawWithMatrix(jlong ts, jfloat *matrix) {
                            0);
     mRenderEngine->setupLayerTexturing(mCameraTex);
     glViewport(0, 0, 1280, 720);
-    mRenderEngine->drawMesh(*mMesh);
-    //mRenderEngine->clearWithColor(rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, 1.f);
+    //mRenderEngine->drawMesh(*mMesh);
+    mRenderEngine->clearWithColor(rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, 1.f);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ALOGI("setupLayerTexture on camera tex %d w %d h %d ", texBuffer->texId(), texBuffer->width(), texBuffer->height());
 
-    deliver(texBuffer, StreamType::kStreamVideo);
+    if (!deliver(texBuffer, StreamType::kStreamVideo)) {
+        ALOGW("Not found deliver !");
+    }
     texBuffer->decRef();
 }
 

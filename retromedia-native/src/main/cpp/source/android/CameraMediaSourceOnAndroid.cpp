@@ -323,10 +323,10 @@ void CameraMediaSourceOnAndroid::createRenderEngine() {
 
     openGl::Mesh::VertexArray<openGl::vec2> position = mMesh->getPositionArray<openGl::vec2>();
     openGl::Transform tr;
-    position[0] = tr.transform(-1, -1);
     position[1] = tr.transform(1, -1);
-    position[2] = tr.transform(1, 1);
+    position[2] = tr.transform(-1, -1);
     position[3] = tr.transform(-1, 1);
+    position[0] = tr.transform(1, 1);
 
     tr.reset();
     openGl::Mesh::VertexArray<openGl::vec2> coord = mMesh->getTexCoordArray<openGl::vec2>();
@@ -411,8 +411,8 @@ void CameraMediaSourceOnAndroid::drawWithMatrix(jlong ts, jfloat *matrix) {
                            0);
     mRenderEngine->setupLayerTexturing(mCameraTex);
     glViewport(0, 0, 1280, 720);
-    //mRenderEngine->drawMesh(*mMesh);
-    mRenderEngine->clearWithColor(rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, 1.f);
+    mRenderEngine->drawMesh(*mMesh);
+    //mRenderEngine->clearWithColor(rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, rand() / (double)RAND_MAX, 1.f);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ALOGI("setupLayerTexture on camera tex %d w %d h %d ", texBuffer->texId(), texBuffer->width(), texBuffer->height());
 
